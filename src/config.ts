@@ -11,6 +11,8 @@ export const config = {
   photon: {
     apiBase: process.env.PHOTON_API_BASE ?? "https://api.photon.example/v2",
     apiKey: process.env.PHOTON_API_KEY ?? "",
+    projectId: process.env.PHOTON_PROJECT_ID ?? "",
+    agentHandle: process.env.PHOTON_AGENT_HANDLE ?? "",
     webhookSecret: process.env.PHOTON_WEBHOOK_SECRET ?? "",
     voiceNumber: process.env.PHOTON_VOICE_NUMBER ?? "",
     mock: bool(process.env.PHOTON_MOCK, true),

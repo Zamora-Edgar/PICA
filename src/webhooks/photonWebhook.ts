@@ -26,7 +26,8 @@ import {
   verifyPhotonSignature,
   type PhotonInboundEvent,
 } from "../integrations/photon";
-import { notifyTrip } from "../notifications";
+import { broadcastItineraryUpdate, notifyTrip } from "../notifications";
+import { executeTool } from "../agent/tools";
 
 export const photonWebhookRouter = Router();
 
@@ -93,8 +94,33 @@ export async function handleInboundMessage(event: PhotonInboundEvent): Promise<v
 
   let replyText: string;
   let itineraryChanged = false;
+  const lower = event.text.toLowerCase().trim();
+
   if (approval.handled) {
     replyText = approval.reply;
+  } else if (lower.includes("remind everyone") || lower.includes("alert everyone") || lower.includes("nudge everyone") || lower.startsWith("remind ") || lower.startsWith("alert ")) {
+    // Fast path: Remind members
+    const targetMatch = lower.match(/(?:remind|alert|nudge)\s+([a-zA-Z]+)/);
+    const targetName = targetMatch && targetMatch[1] !== "everyone" && targetMatch[1] !== "all" ? targetMatch[1] : "all";
+    const toolRes = await executeTool("remind_members", { memberName: targetName }, { tripId: trip.id, userId: user.id });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = toolRes.data as any;
+    replyText = data.message || "Sent reminders to the group to confirm their shares!";
+  } else if (lower.includes("adjust to my budget") || lower.includes("fit my budget") || lower.includes("adjust to budget") || lower.includes("make it fit") || lower.includes("budget is") || lower.includes("over budget")) {
+    // Fast path: Adjust to budget with optional dollar amount extraction
+    const dollarMatch = lower.match(/\$(\d+)/) || lower.match(/(\d+)\s*(?:dollars|bucks)/);
+    const targetDollars = dollarMatch ? Number(dollarMatch[1]) : undefined;
+    const toolRes = await executeTool("adjust_to_budget", {
+      targetBudgetDollars: targetDollars,
+      newMemberBudgetDollars: targetDollars,
+    }, { tripId: trip.id, userId: user.id });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = toolRes.data as any;
+    itineraryChanged = toolRes.itineraryChanged ?? true;
+    replyText = `🌴 Adjusted the itinerary to fit your budget!\n\n` +
+      `Changes:\n` + (data.changes ?? []).map((c: string) => `• ${c}`).join("\n") + `\n\n` +
+      `💵 Your new share: ${data.newShare} (Budget: ${data.targetBudget})\n` +
+      `New group splits: ${(data.allCosts ?? []).join(", ")}`;
   } else {
     // 5. Everything else goes to the agent with the full cross-channel context.
     const result = await runAgent({
@@ -114,8 +140,8 @@ export async function handleInboundMessage(event: PhotonInboundEvent): Promise<v
     data: { tripId: trip.id, userId: user.id, channel: event.channel, direction: "OUTBOUND", body: replyText },
   });
 
-  // 7. Keep everyone else in sync on their own preferred channel.
+  // 7. Keep everyone else in sync with full updated itinerary on their preferred channel.
   if (itineraryChanged) {
-    await notifyTrip(trip.id, `📍 ${user.name} updated the plan: ${replyText}`, user.id);
+    await broadcastItineraryUpdate(trip.id, user.id, replyText);
   }
 }

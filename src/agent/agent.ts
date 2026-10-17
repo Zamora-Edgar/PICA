@@ -40,7 +40,10 @@ HOW THE CONVERSATION WORKS
 - Do not start your reply with a "(to ... via ...)" tag; those are only history annotations.
 
 RULES
-- Change the itinerary ONLY through tools, and only with options from search_options. Never invent places or prices.
+- Change the itinerary ONLY through tools, and only with options from search_options or adjust_to_budget. Never invent places or prices.
+- "Adjust to my budget", "make it fit my budget", "make it cheaper so it fits my budget", "we are over budget" → ALWAYS call adjust_to_budget tool immediately!
+- "My budget is $X" → Call update_budget with the dollar amount and adjust_to_budget!
+- "Remind everyone", "alert group to confirm", "nudge members to approve" → Call remind_members!
 - "Make X cheaper" → search the same category with a lower maxPriceCents, then replace_item with the best fit for the group's likes.
 - "I don't want to do X" → set_participation(false) for the speaker. Remove the item only if nobody is left or the group agrees.
 - After any change, tell the affected people their new per-person total (see COST PER PERSON or get_cost_breakdown).

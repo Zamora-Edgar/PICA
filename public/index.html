@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripSync — Autonomous Group Trip & Visa Commerce Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 24, 38, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(255, 255, 255, 0.12);
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.3);
+      --visa-gold: #f59e0b;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      font-weight: 800;
+      font-size: 20px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+    .logo-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo-title p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #34d399;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .hero-meta h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .hero-tags {
+      display: flex;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .hero-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .photon-pill {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .photon-pill .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #93c5fd;
+      font-weight: 600;
+    }
+    .photon-pill .number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+
+    /* Grid Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Members Grid */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .member-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .member-item:hover {
+      border-color: var(--card-hover);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .member-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .member-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .member-channel {
+      font-size: 11px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .member-phone {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .member-costs {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.06);
+    }
+    .share-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: #34d399;
+    }
+    .budget-limit {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Itinerary List */
+    .itinerary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .itinerary-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .item-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .item-title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .category-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .cat-LODGING { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
+    .cat-FOOD { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    .cat-ACTIVITY { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .item-desc {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .item-cost-box {
+      text-align: right;
+    }
+    .item-total {
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .item-split {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Visa Card Box */
+    .visa-card {
+      background: linear-gradient(135deg, #1e3a8a, #0f172a);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+    }
+    .visa-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .visa-logo {
+      font-weight: 800;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--visa-gold);
+    }
+    .visa-chip {
+      width: 32px;
+      height: 24px;
+      background: linear-gradient(135deg, #d97706, #fbbf24);
+      border-radius: 4px;
+    }
+    .visa-token {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .visa-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Guardrail Rules */
+    .rule-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .rule-icon {
+      font-size: 16px;
+    }
+
+    /* Message Timeline */
+    .message-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .msg-bubble {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+    .msg-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .msg-author {
+      font-weight: 600;
+      color: #93c5fd;
+    }
+    .msg-text {
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-group">
+        <div class="logo-badge">TripSync</div>
+        <div class="logo-title">
+          <h1>Autonomous Group Itinerary Commerce Agent</h1>
+          <p>Powered by Photon 2.0 Multi-Channel & Visa Intelligent Commerce</p>
+        </div>
+      </div>
+      <div class="status-pill">
+        <div class="pulse-dot"></div>
+        <span>Live Cross-Channel Bridge Active</span>
+      </div>
+    </header>
+
+    <div class="hero-banner">
+      <div class="hero-meta">
+        <h2 id="trip-name">San Diego Weekend Getaway</h2>
+        <div class="hero-tags">
+          <div class="hero-tag">📍 <span id="trip-dest">San Diego</span></div>
+          <div class="hero-tag">📅 <span id="trip-dates">Oct 24 – Oct 25, 2026</span></div>
+          <div class="hero-tag">👥 <span id="member-count">3 Members</span></div>
+        </div>
+      </div>
+      <div class="photon-pill">
+        <div class="label">Photon iMessage / SMS Line</div>
+        <div class="number">+1 (628) 316-6196</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <!-- Left Column: Members & Itinerary -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Members Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 Group Members & Fair Share Split</div>
+          </div>
+          <div class="members-grid" id="members-list">
+            <!-- Dynamic members injected here -->
+          </div>
+        </div>
+
+        <!-- Itinerary Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗺️ Group Itinerary & Cost Splits</div>
+            <div style="font-size: 14px; font-weight: 700; color: #34d399;" id="total-trip-cost">$0</div>
+          </div>
+          <div class="itinerary-list" id="itinerary-list">
+            <!-- Dynamic items injected here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Visa Vault & Live Feed -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Visa Guardrail Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💳 Visa Intelligent Commerce</div>
+          </div>
+          <div class="visa-card">
+            <div class="visa-header">
+              <div class="visa-chip"></div>
+              <div class="visa-logo">VISA</div>
+            </div>
+            <div class="visa-token">•••• •••• •••• 8821</div>
+            <div class="visa-footer">
+              <div>Agent Auth Token</div>
+              <div>Expires: 10/28</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="rule-item">
+              <div class="rule-icon">⚡</div>
+              <div><strong>Auto-Purchase:</strong> Up to $50/person</div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-icon">🛡️</div>
+              <div><strong>Approval Required:</strong> $50 – $300</div>
+            </div>
+            <div class="rule-item">
+              <div class="rule-icon">🚫</div>
+              <div><strong>Hard Ceiling Cap:</strong> Over $1,000</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Cross-Channel Feed -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📡 Live Multi-Channel Thread</div>
+          </div>
+          <div class="message-timeline" id="message-feed">
+            <div style="color: var(--text-muted); font-size: 13px;">Listening for messages via Photon...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/active');
+        if (!res.ok) return;
+        const data = await res.json();
+        const { trip, costs, messages } = data;
+
+        document.getElementById('trip-name').textContent = trip.name;
+        document.getElementById('trip-dest').textContent = trip.destination;
+        document.getElementById('member-count').textContent = `${trip.members.length} Members`;
+
+        // Total cost
+        const totalCents = trip.items.reduce((sum, item) => sum + (item.priceCents || 0), 0);
+        document.getElementById('total-trip-cost').textContent = `Total: $${(totalCents / 100).toFixed(2)}`;
+
+        // Members Render
+        const membersList = document.getElementById('members-list');
+        membersList.innerHTML = trip.members.map(m => {
+          const costInfo = costs.find(c => c.userId === m.user.id) || { totalCents: 0, budgetCents: 40000 };
+          const shareUsd = (costInfo.totalCents / 100).toFixed(2);
+          const budgetUsd = (costInfo.budgetCents / 100).toFixed(0);
+          return `
+            <div class="member-item">
+              <div class="member-top">
+                <span class="member-name">${m.user.name}</span>
+                <span class="member-channel">${m.user.preferredChannel}</span>
+              </div>
+              <div class="member-phone">${m.user.phoneE164}</div>
+              <div class="member-costs">
+                <div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Current Share</div>
+                  <div class="share-amount">$${shareUsd}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 11px; color: var(--text-muted);">Budget Cap</div>
+                  <div class="budget-limit">$${budgetUsd}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Itinerary Render
+        const itList = document.getElementById('itinerary-list');
+        itList.innerHTML = trip.items.map(it => {
+          const totalUsd = (it.priceCents / 100).toFixed(2);
+          const perPersonUsd = (it.priceCents / 100 / trip.members.length).toFixed(2);
+          return `
+            <div class="itinerary-item">
+              <div class="item-meta">
+                <div class="item-title-row">
+                  <span class="item-title">${it.title}</span>
+                  <span class="category-badge cat-${it.category}">${it.category}</span>
+                </div>
+                <div class="item-desc">${it.description || it.merchantName}</div>
+              </div>
+              <div class="item-cost-box">
+                <div class="item-total">$${totalUsd}</div>
+                <div class="item-split">$${perPersonUsd}/person</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Message Feed Render
+        const feed = document.getElementById('message-feed');
+        if (messages && messages.length > 0) {
+          feed.innerHTML = messages.map(msg => `
+            <div class="msg-bubble">
+              <div class="msg-header">
+                <span class="msg-author">${msg.direction === 'INBOUND' ? '👤 ' + (msg.user?.name || 'User') : '✈️ TripSync Agent'}</span>
+                <span>${msg.channel.toUpperCase()}</span>
+              </div>
+              <div class="msg-text">${msg.body}</div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.warn('Dashboard fetch error:', err);
+      }
+    }
+
+    loadDashboard();
+    setInterval(loadDashboard, 3000);
+  </script>
+</body>
+</html>

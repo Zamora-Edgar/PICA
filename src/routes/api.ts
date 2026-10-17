@@ -133,3 +133,20 @@ apiRouter.get("/trips/:id", handle(async (req, res) => {
   const trip = await loadTripSnapshot(req.params.id);
   res.json({ trip, costs: computeCostBreakdown(trip) });
 }));
+
+// Quick access to latest active trip for dashboard
+apiRouter.get("/active", handle(async (_req, res) => {
+  const trip = await prisma.trip.findFirst({
+    where: { status: { in: ["PLANNING", "BOOKING"] } },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!trip) return res.status(404).json({ error: "No active trip found" });
+  const snapshot = await loadTripSnapshot(trip.id);
+  const messages = await prisma.message.findMany({
+    where: { tripId: trip.id },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    include: { user: true },
+  });
+  res.json({ trip: snapshot, costs: computeCostBreakdown(snapshot), messages });
+}));
