@@ -49,7 +49,7 @@ export async function seedDemoData(): Promise<void> {
   const jairo = await prisma.user.create({
     data: {
       name: "Jairo",
-      phoneE164: "+16505550193",
+      phoneE164: "+13105942317",
       preferredChannel: "imessage",
       visaAgentTokenRef: "tok_jairo",
       spendingRule: {
