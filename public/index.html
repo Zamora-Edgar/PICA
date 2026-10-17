@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CartBot — AI Shopping Assistant</title>
+  <meta name="description" content="CartBot finds the cheapest prices for your shopping list across Walmart, Target, and Amazon — all via text message." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080b14;
+      --surface: #0f1422;
+      --surface2: #161c2e;
+      --border: rgba(255,255,255,0.08);
+      --accent: #4ade80;
+      --accent2: #22d3ee;
+      --accent3: #a78bfa;
+      --text: #f0f4ff;
+      --muted: #6b7280;
+      --walmart: #0071dc;
+      --target: #cc0000;
+      --amazon: #ff9900;
+      --radius: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background ─────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(74,222,128,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(34,211,238,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(167,139,250,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── Layout ──────────────────────────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ── Nav ─────────────────────────────────────────────────────────────── */
+    nav {
+      padding: 20px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,11,20,0.85);
+    }
+    .logo {
+      font-size: 22px; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo-icon { font-size: 26px; }
+    .nav-badge {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
+      color: var(--accent); padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────────────── */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 20px;
+      background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.2);
+      padding: 6px 14px; border-radius: 999px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900; line-height: 1.05; letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px; color: var(--muted); max-width: 560px; margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .hero-cta { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s ease; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #16a34a);
+      color: #000; box-shadow: 0 0 30px rgba(74,222,128,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(74,222,128,0.4); }
+    .btn-ghost {
+      background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+
+    /* ── Stats Row ───────────────────────────────────────────────────────── */
+    .stats-row {
+      display: flex; gap: 1px; background: var(--border);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; margin: 50px 0;
+    }
+    .stat { flex: 1; padding: 24px; background: var(--surface); text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Demo Section ────────────────────────────────────────────────────── */
+    .demo-section {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 60px 0;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .demo-section { grid-template-columns: 1fr; } }
+
+    /* ── Phone Mockup ────────────────────────────────────────────────────── */
+    .phone-wrap { display: flex; justify-content: center; }
+    .phone {
+      width: 300px; background: #1a1a2e;
+      border-radius: 40px; padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+    }
+    .phone-notch {
+      width: 80px; height: 24px; background: #0a0a14;
+      border-radius: 0 0 20px 20px; margin: 0 auto 12px;
+    }
+    .phone-screen {
+      background: #000; border-radius: 28px;
+      padding: 16px; min-height: 480px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .phone-header {
+      text-align: center; font-size: 13px; font-weight: 600;
+      color: #fff; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .bubble-row { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .bubble {
+      max-width: 85%; padding: 10px 14px; border-radius: 18px;
+      font-size: 13px; line-height: 1.45;
+      animation: slideIn 0.4s ease forwards; opacity: 0;
+    }
+    .bubble.user {
+      background: #007aff; color: #fff;
+      border-bottom-right-radius: 4px; align-self: flex-end;
+      animation-delay: 0.2s;
+    }
+    .bubble.bot {
+      background: #2c2c2e; color: #fff;
+      border-bottom-left-radius: 4px; align-self: flex-start;
+      white-space: pre-line;
+    }
+    .bubble.bot:nth-child(2) { animation-delay: 0.8s; }
+    .bubble.bot:nth-child(3) { animation-delay: 2s; }
+    .typing-bubble {
+      background: #2c2c2e; padding: 12px 16px; border-radius: 18px;
+      border-bottom-left-radius: 4px; align-self: flex-start; width: 52px;
+      animation: slideIn 0.4s ease 0.6s forwards, fadeOut 0.3s ease 1.8s forwards;
+      opacity: 0;
+    }
+    .typing-dots { display: flex; gap: 4px; align-items: center; }
+    .typing-dots span {
+      width: 6px; height: 6px; background: #6b7280; border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { to { opacity: 0; display: none; } }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+    /* ── How It Works ────────────────────────────────────────────────────── */
+    .section-title {
+      font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 12px;
+    }
+    .section-heading { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 40px; }
+
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px; background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); transition: border-color 0.2s, transform 0.2s;
+    }
+    .step:hover { border-color: rgba(74,222,128,0.3); transform: translateX(4px); }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: #000;
+    }
+    .step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .step-content p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    /* ── Price Cards ─────────────────────────────────────────────────────── */
+    .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 60px 0; }
+    @media (max-width: 640px) { .price-grid { grid-template-columns: 1fr; } }
+
+    .price-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .price-card.walmart { border-top: 3px solid var(--walmart); }
+    .price-card.target { border-top: 3px solid var(--target); }
+    .price-card.amazon { border-top: 3px solid var(--amazon); }
+    .store-logo { font-size: 28px; margin-bottom: 8px; }
+    .store-name { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .store-items { display: flex; flex-direction: column; gap: 6px; }
+    .store-item { display: flex; justify-content: space-between; font-size: 13px; }
+    .store-item .item-name { color: var(--muted); }
+    .store-item .item-price { font-weight: 600; }
+    .store-item .cheapest { color: var(--accent); }
+    .card-total {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+      font-size: 18px; font-weight: 800;
+    }
+
+    /* ── Demo Input ──────────────────────────────────────────────────────── */
+    .demo-input-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; margin: 60px 0;
+    }
+    .demo-input-section h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .demo-input-section p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+    .input-row { display: flex; gap: 10px; }
+    .demo-input {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 18px; color: var(--text); font-size: 15px;
+      font-family: inherit; outline: none; transition: border-color 0.2s;
+    }
+    .demo-input:focus { border-color: rgba(74,222,128,0.5); }
+    .demo-input::placeholder { color: var(--muted); }
+
+    .result-box {
+      margin-top: 20px; padding: 20px; background: var(--surface2);
+      border-radius: 12px; border: 1px solid var(--border);
+      font-size: 14px; line-height: 1.7; white-space: pre-wrap; display: none;
+    }
+    .result-box.visible { display: block; animation: slideIn 0.3s ease; }
+    .loading-spinner {
+      display: none; justify-content: center; padding: 20px;
+    }
+    .loading-spinner.visible { display: flex; }
+    .spinner {
+      width: 24px; height: 24px; border: 3px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Tech Stack ──────────────────────────────────────────────────────── */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 40px 0; }
+    .tech-chip {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px;
+    }
+    .tech-emoji { font-size: 20px; }
+    .tech-info { }
+    .tech-name { font-weight: 600; }
+    .tech-role { font-size: 11px; color: var(--muted); }
+
+    /* ── Footer ──────────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border); padding: 32px 0; text-align: center;
+      color: var(--muted); font-size: 13px; margin-top: 80px;
+    }
+
+    /* ── Prize Badges ────────────────────────────────────────────────────── */
+    .prizes { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .prize-badge {
+      font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 999px;
+      border: 1px solid; display: flex; align-items: center; gap: 5px;
+    }
+    .prize-badge.photon { color: #60a5fa; border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.08); }
+    .prize-badge.visa { color: #fbbf24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+    .prize-badge.applied { color: var(--accent); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.08); }
+    .prize-badge.gemini { color: var(--accent3); border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.08); }
+    .prize-badge.browser { color: var(--accent2); border-color: rgba(34,211,238,0.3); background: rgba(34,211,238,0.08); }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <div class="container">
+    <nav>
+      <div class="logo">
+        <span class="logo-icon">🛒</span> CartBot
+      </div>
+      <span class="nav-badge">LA Hacks 2026</span>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <div class="container">
+    <section class="hero">
+      <div class="hero-tag">🏆 AI Shopping Assistant</div>
+      <h1>Find the <span class="gradient">cheapest prices</span><br />over text message</h1>
+      <p>Just text your shopping list. CartBot compares prices across Walmart, Target, and Amazon — and can auto-fill your cart.</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn btn-primary" id="try-demo-btn">✨ Try the Demo</a>
+        <a href="#how-it-works" class="btn btn-ghost">How it works →</a>
+      </div>
+      <div class="prizes">
+        <span class="prize-badge photon">🏅 Photon Challenge</span>
+        <span class="prize-badge visa">🏅 Visa Commerce</span>
+        <span class="prize-badge applied">🏅 Applied Intelligence</span>
+        <span class="prize-badge gemini">🏅 Best Use of Gemini</span>
+        <span class="prize-badge browser">🏅 Browser Use</span>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Stores compared</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">~10s</div>
+        <div class="stat-label">Response time</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">App to download</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Text native</div>
+      </div>
+    </div>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="how-it-works">
+      <!-- Phone Mockup -->
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-header">🛒 CartBot</div>
+            <div class="bubble-row">
+              <div class="bubble user">milk, eggs, paper towels, Advil, laundry detergent</div>
+              <div class="typing-bubble">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="bubble bot">🔍 Searching prices... hang tight!</div>
+              <div class="bubble bot">🛒 CartBot found your prices!
+
+• Milk → Walmart $2.98 ✅
+• Eggs (12ct) → Walmart $3.82 ✅
+• Paper Towels → Amazon $7.49 ✅
+• Advil 200ct → Walmart $12.97 ✅
+• Laundry Det. → Costco $14.99 ✅
+
+💰 Best split: ~$42.25
+🏆 All Walmart: ~$44.50
+
+Reply CART to auto-build! 🛍️</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div>
+        <p class="section-title">How It Works</p>
+        <h2 class="section-heading">Shopping made<br />ridiculously easy</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h3>Text your list</h3>
+              <p>Send your shopping list in plain English over iMessage, SMS, or WhatsApp — no app, no login.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h3>AI parses & searches</h3>
+              <p>Gemini AI understands your list, then CartBot searches Walmart, Target, Amazon and more in parallel.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h3>Get the cheapest prices</h3>
+              <p>Receive a clear price breakdown showing the cheapest option per item and total savings.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h3>Reply "CART" to auto-shop</h3>
+              <p>One word and your cart is pre-built at the cheapest store. Checkout in seconds.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Price Comparison Example -->
+    <p class="section-title">Price Comparison</p>
+    <h2 class="section-heading">See the savings in action</h2>
+    <div class="price-grid">
+      <div class="price-card walmart">
+        <div class="store-logo">🔵</div>
+        <div class="store-name">Walmart</div>
+        <div class="store-items">
+          <div class="store-item"><span class="item-name">Milk (1gal)</span><span class="item-price cheapest">$2.98 ✅</span></div>
+          <div class="store-item"><span class="item-name">Eggs (12ct)</span><span class="item-price cheapest">$3.82 ✅</span></div>
+          <div class="store-item"><span class="item-name">Paper Towels</span><span class="item-price">$8.97</span></div>
+          <div class="store-item"><span class="item-name">Advil 200ct</span><span class="item-price cheapest">$12.97 ✅</span></div>
+          <div class="store-item"><span class="item-name">Laundry Det.</span><span class="item-price">$16.42</span></div>
+        </div>
+        <div class="card-total">$45.16</div>
+      </div>
+      <div class="price-card target">
+        <div class="store-logo">🎯</div>
+        <div class="store-name">Target</div>
+        <div class="store-items">
+          <div class="store-item"><span class="item-name">Milk (1gal)</span><span class="item-price">$3.29</span></div>
+          <div class="store-item"><span class="item-name">Eggs (12ct)</span><span class="item-price">$4.49</span></div>
+          <div class="store-item"><span class="item-name">Paper Towels</span><span class="item-price">$9.99</span></div>
+          <div class="store-item"><span class="item-name">Advil 200ct</span><span class="item-price">$15.99</span></div>
+          <div class="store-item"><span class="item-name">Laundry Det.</span><span class="item-price">$17.99</span></div>
+        </div>
+        <div class="card-total">$51.75</div>
+      </div>
+      <div class="price-card amazon">
+        <div class="store-logo">📦</div>
+        <div class="store-name">Amazon</div>
+        <div class="store-items">
+          <div class="store-item"><span class="item-name">Milk (1gal)</span><span class="item-price">$4.10</span></div>
+          <div class="store-item"><span class="item-name">Eggs (12ct)</span><span class="item-price">$5.12</span></div>
+          <div class="store-item"><span class="item-name">Paper Towels</span><span class="item-price cheapest">$7.49 ✅</span></div>
+          <div class="store-item"><span class="item-name">Advil 200ct</span><span class="item-price">$13.99</span></div>
+          <div class="store-item"><span class="item-name">Laundry Det.</span><span class="item-price">$15.89</span></div>
+        </div>
+        <div class="card-total">$46.59</div>
+      </div>
+    </div>
+
+    <!-- Live Demo -->
+    <section class="demo-input-section" id="demo">
+      <h2>🧪 Try CartBot Live</h2>
+      <p>Enter a shopping list below to see CartBot's response (calls our live backend):</p>
+      <div class="input-row">
+        <input
+          id="demo-input"
+          class="demo-input"
+          type="text"
+          placeholder="e.g. milk, eggs, paper towels, Advil, shampoo"
+          autocomplete="off"
+        />
+        <button class="btn btn-primary" id="demo-btn" onclick="runDemo()">Search 🔍</button>
+      </div>
+      <div class="loading-spinner" id="loading"><div class="spinner"></div></div>
+      <div class="result-box" id="result-box"></div>
+    </section>
+
+    <!-- Tech Stack -->
+    <p class="section-title">Tech Stack</p>
+    <h2 class="section-heading">Built with the best tools</h2>
+    <div class="tech-grid">
+      <div class="tech-chip">
+        <span class="tech-emoji">💬</span>
+        <div class="tech-info">
+          <div class="tech-name">Photon 2.0</div>
+          <div class="tech-role">iMessage · SMS · WhatsApp</div>
+        </div>
+      </div>
+      <div class="tech-chip">
+        <span class="tech-emoji">✨</span>
+        <div class="tech-info">
+          <div class="tech-name">Google Gemini</div>
+          <div class="tech-role">NLP · List parsing</div>
+        </div>
+      </div>
+      <div class="tech-chip">
+        <span class="tech-emoji">🔍</span>
+        <div class="tech-info">
+          <div class="tech-name">SerpAPI</div>
+          <div class="tech-role">Google Shopping prices</div>
+        </div>
+      </div>
+      <div class="tech-chip">
+        <span class="tech-emoji">🌐</span>
+        <div class="tech-info">
+          <div class="tech-name">Browser Use</div>
+          <div class="tech-role">Cart automation</div>
+        </div>
+      </div>
+      <div class="tech-chip">
+        <span class="tech-emoji">⚡</span>
+        <div class="tech-info">
+          <div class="tech-name">Node.js + TypeScript</div>
+          <div class="tech-role">Backend API</div>
+        </div>
+      </div>
+      <div class="tech-chip">
+        <span class="tech-emoji">🚇</span>
+        <div class="tech-info">
+          <div class="tech-name">LocalTunnel</div>
+          <div class="tech-role">Webhook exposure</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>🛒 CartBot — Built at LA Hacks 2026 in 36 hours ⚡</p>
+    </div>
+  </footer>
+
+  <script>
+    // Animate stats on load
+    document.querySelectorAll('.stat-num').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(10px)';
+      el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    });
+    setTimeout(() => {
+      document.querySelectorAll('.stat-num').forEach((el, i) => {
+        setTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, i * 100);
+      });
+    }, 300);
+
+    // Allow pressing Enter to run demo
+    document.getElementById('demo-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runDemo();
+    });
+
+    async function runDemo() {
+      const input = document.getElementById('demo-input').value.trim();
+      if (!input) return;
+
+      const loading = document.getElementById('loading');
+      const resultBox = document.getElementById('result-box');
+      const btn = document.getElementById('demo-btn');
+
+      loading.classList.add('visible');
+      resultBox.classList.remove('visible');
+      btn.disabled = true;
+      btn.textContent = 'Searching...';
+
+      try {
+        // Call our local backend
+        const res = await fetch('/demo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: input }),
+        });
+
+        const data = await res.json();
+        resultBox.textContent = data.reply || data.error || 'Something went wrong.';
+        resultBox.classList.add('visible');
+      } catch (err) {
+        resultBox.textContent = '⚠️ Backend not running. Start the server with "npm run dev" then refresh!';
+        resultBox.classList.add('visible');
+      } finally {
+        loading.classList.remove('visible');
+        btn.disabled = false;
+        btn.textContent = 'Search 🔍';
+      }
+    }
+  </script>
+</body>
+</html>
