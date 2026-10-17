@@ -1,0 +1,101 @@
+/**
+ * The planning agent: one tool-calling loop over an OpenAI-compatible chat API.
+ * Works with OpenAI directly, or with Gemini by setting LLM_BASE_URL to Gemini's
+ * OpenAI-compatible endpoint — no code changes.
+ */
+import OpenAI from "openai";
+import { config } from "../config";
+import type { Channel } from "../integrations/photon";
+import { executeTool, TOOL_DEFINITIONS } from "./tools";
+import { loadConversationHistory, loadTripSnapshot, renderTripContext } from "./tripContext";
+
+let client: OpenAI | undefined; // created on first use so the server boots without an API key
+const llm = () => (client ??= new OpenAI({ apiKey: config.llm.apiKey, baseURL: config.llm.baseURL }));
+const MAX_TOOL_ROUNDS = 6;
+
+export interface AgentInput {
+  tripId: string;
+  userId: string;
+  userName: string;
+  channel: Channel;
+  text: string;
+}
+
+export interface AgentResult {
+  reply: string;
+  itineraryChanged: boolean;
+}
+
+function systemPrompt(tripContext: string, input: AgentInput): string {
+  const voice =
+    input.channel === "voice"
+      ? "They are on a PHONE CALL: your reply is read aloud. Two or three short sentences, no lists, no emoji, no ids, say amounts naturally (\"about a hundred fifty dollars each\")."
+      : "They are texting: be concise and friendly, short lines, light emoji OK. Never show internal ids.";
+
+  return `You are TripSync, an AI travel agent for a group trip. You talk to members over iMessage, SMS, WhatsApp and phone calls.
+
+HOW THE CONVERSATION WORKS
+- The history is ONE shared thread for the whole trip across every channel. Lines are tagged [Name via channel].
+  A person may text on WhatsApp and later call you — it's the same conversation; continue naturally.
+- Do not start your reply with a "(to ... via ...)" tag; those are only history annotations.
+
+RULES
+- Change the itinerary ONLY through tools, and only with options from search_options. Never invent places or prices.
+- "Make X cheaper" → search the same category with a lower maxPriceCents, then replace_item with the best fit for the group's likes.
+- "I don't want to do X" → set_participation(false) for the speaker. Remove the item only if nobody is left or the group agrees.
+- After any change, tell the affected people their new per-person total (see COST PER PERSON or get_cost_breakdown).
+- Respect likes/dislikes and flag anyone who goes over budget.
+- You CANNOT approve or complete payments. request_purchase hands off to the Visa trust layer: it auto-buys within each person's
+  rules or sends them an approval request. Report the tool result honestly — never say something is booked unless it is.
+- Call request_purchase only when a member explicitly asks to book or buy.
+- Tool amounts are integer cents; speak in dollars.
+
+CURRENT SPEAKER: ${input.userName} (id ${input.userId}) via ${input.channel}. ${voice}
+
+${tripContext}`;
+}
+
+export async function runAgent(input: AgentInput): Promise<AgentResult> {
+  const [trip, history] = await Promise.all([
+    loadTripSnapshot(input.tripId),
+    // The inbound message is already saved, so it's the last line of history.
+    loadConversationHistory(input.tripId, config.historyLimit),
+  ]);
+
+  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    { role: "system", content: systemPrompt(renderTripContext(trip), input) },
+    ...history,
+  ];
+
+  let itineraryChanged = false;
+
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    const completion = await llm().chat.completions.create({
+      model: config.llm.model,
+      messages,
+      tools: TOOL_DEFINITIONS,
+      tool_choice: "auto",
+    });
+    const message = completion.choices[0].message;
+    messages.push(message);
+
+    if (!message.tool_calls?.length) {
+      return { reply: message.content?.trim() || "Got it!", itineraryChanged };
+    }
+
+    for (const call of message.tool_calls) {
+      if (call.type !== "function") continue;
+      let args: unknown = {};
+      try {
+        args = JSON.parse(call.function.arguments || "{}");
+      } catch {
+        /* invalid JSON → schema validation reports it back to the model */
+      }
+      const result = await executeTool(call.function.name, args, { tripId: input.tripId, userId: input.userId });
+      itineraryChanged ||= !!result.itineraryChanged;
+      messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify(result.data) });
+    }
+  }
+
+  return { reply: "Sorry, I got tangled up there — could you say that again?", itineraryChanged };
+}
