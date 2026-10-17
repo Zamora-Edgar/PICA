@@ -1,0 +1,191 @@
+// TripSync data model (SQLite for the hackathon; swap provider to "postgresql" for prod).
+// SQLite has no native enums or scalar lists, so enums are strings (allowed values in comments,
+// typed in src/domain/types.ts) and lists are JSON-encoded strings.
+// All money is stored as integer cents.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Groups ──────────────────────────────────────────────────────────────────
+
+/// A Trip is the "group": its members, itinerary, and one shared conversation.
+model Trip {
+  id          String   @id @default(cuid())
+  name        String
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("PLANNING") // PLANNING | BOOKING | BOOKED | CANCELLED
+  inviteCode  String   @unique
+  inviteUrl   String? // Photon-generated short link sent to friends
+  organizerId String
+  organizer   User     @relation("OrganizedTrips", fields: [organizerId], references: [id])
+
+  members  TripMember[]
+  items    ItineraryItem[]
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Join table: a user's membership in a trip, plus the preferences collected via the invite link.
+model TripMember {
+  tripId      String
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String   @default("MEMBER") // ORGANIZER | MEMBER
+  budgetCents Int? // this person's total budget for the trip
+  likes       String   @default("[]") // JSON string[]
+  dislikes    String   @default("[]") // JSON string[]
+  joinedAt    DateTime @default(now())
+
+  @@id([tripId, userId])
+}
+
+// ─── Users, identities & spending rules ──────────────────────────────────────
+
+model User {
+  id               String  @id @default(cuid())
+  name             String
+  phoneE164        String  @unique
+  email            String?
+  preferredChannel String  @default("sms") // imessage | sms | whatsapp | voice
+
+  /// Visa Intelligent Commerce agent token reference. Opaque, agent-scoped, revocable.
+  /// We NEVER store a card number — enrollment happens client-side with Visa.
+  visaAgentTokenRef String?
+
+  identities     ChannelIdentity[]
+  spendingRule   SpendingRule?
+  memberships    TripMember[]
+  organizedTrips Trip[]            @relation("OrganizedTrips")
+  splits         ExpenseSplit[]
+  approvals      ApprovalRequest[]
+  messages       Message[]
+
+  createdAt DateTime @default(now())
+}
+
+/// Every address a user can reach us from. This is what makes context survive channel
+/// switches: WhatsApp "+15551234567", iMessage "ana@icloud.com", and a Photon voice call
+/// from "+15551234567" all resolve to the same User → same Trip → same conversation.
+model ChannelIdentity {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel String // imessage | sms | whatsapp | voice
+  address String // normalized: E.164 phone or lowercase email
+
+  @@unique([channel, address])
+}
+
+/// User-defined guardrails the agent must obey before spending. Mirrored onto the Visa
+/// agent token so the network enforces them too (see src/integrations/visa.ts).
+model SpendingRule {
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  autoApproveLimitCents Int     @default(0) // ≤ this → agent may buy without asking. 0 = always ask.
+  perTransactionMaxCents Int    @default(100000) // hard cap: above this the agent can't buy, even with approval
+  dailyLimitCents       Int? // soft cap across all trips; exceeding it escalates to approval
+  allowedCategories     String  @default("[]") // JSON ItemCategory[]; empty = all
+  blockedMerchants      String  @default("[]") // JSON string[]; substring match, hard block
+  alwaysRequireApproval Boolean @default(false)
+
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Itinerary ───────────────────────────────────────────────────────────────
+
+model ItineraryItem {
+  id             String    @id @default(cuid())
+  tripId         String
+  trip           Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  dayIndex       Int // 1-based day of the trip
+  category       String // LODGING | ACTIVITY | FOOD | TRANSPORT
+  title          String
+  description    String?
+  catalogOptionId String? // which bookable option this came from
+  merchantName   String
+  visaMerchantId String?
+  priceCents     Int // total for all participants
+  currency       String    @default("USD")
+  optOutUserIds  String    @default("[]") // JSON string[]: members not doing / not paying for this item
+  status         String    @default("PROPOSED") // PROPOSED | PURCHASING | FINALIZING | PURCHASED | REMOVED
+  version        Int       @default(1) // bumped on every agent edit
+
+  splits ExpenseSplit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Expenses ────────────────────────────────────────────────────────────────
+
+/// One member's share of one itinerary item, plus the trust-layer verdict and Visa outcome.
+model ExpenseSplit {
+  id                  String    @id @default(cuid())
+  itemId              String
+  item                ItineraryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User      @relation(fields: [userId], references: [id])
+  amountCents         Int
+  status              String    @default("PENDING_APPROVAL") // PENDING_APPROVAL | AUTHORIZED | CAPTURED | DECLINED | VOIDED | FAILED
+  decision            String // AUTO_PURCHASE | REQUIRE_APPROVAL | DECLINE (trust-layer verdict)
+  decisionDetail      String // human-readable reasons; sent to the user and kept for audit
+  visaAuthorizationId String?
+  authorizedAt        DateTime?
+  failureReason       String?
+
+  approval ApprovalRequest?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([itemId, userId])
+  @@index([userId, status])
+}
+
+/// Human-in-the-loop approval sent over the user's preferred Photon channel.
+model ApprovalRequest {
+  id          String       @id @default(cuid())
+  splitId     String       @unique
+  split       ExpenseSplit @relation(fields: [splitId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  code        String // short code the user replies with: "YES 4821"
+  channel     String
+  status      String       @default("PENDING") // PENDING | APPROVED | DECLINED | EXPIRED
+  expiresAt   DateTime
+  respondedAt DateTime?
+  createdAt   DateTime     @default(now())
+
+  @@index([userId, status])
+}
+
+// ─── Unified conversation ────────────────────────────────────────────────────
+
+/// Every inbound and outbound message for a trip, from every channel, in one timeline.
+/// The agent reads this as a single thread — the channel is just a tag.
+model Message {
+  id            String   @id @default(cuid())
+  tripId        String?
+  trip          Trip?    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  channel       String
+  direction     String // INBOUND | OUTBOUND
+  body          String
+  photonEventId String?  @unique // idempotency: Photon may retry a webhook
+  createdAt     DateTime @default(now())
+
+  @@index([tripId, createdAt])
+}

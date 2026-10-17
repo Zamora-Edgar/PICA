@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node / TripSync
+node_modules/
+.env
+prisma/*.db
+prisma/*.db-journal
