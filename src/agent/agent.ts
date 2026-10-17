@@ -11,7 +11,7 @@ import { loadConversationHistory, loadTripSnapshot, renderTripContext } from "./
 
 let client: OpenAI | undefined; // created on first use so the server boots without an API key
 const llm = () => (client ??= new OpenAI({ apiKey: config.llm.apiKey, baseURL: config.llm.baseURL }));
-const MAX_TOOL_ROUNDS = 6;
+const MAX_TOOL_ROUNDS = 8;
 
 export interface AgentInput {
   tripId: string;
@@ -32,18 +32,19 @@ function systemPrompt(tripContext: string, input: AgentInput): string {
       ? "They are on a PHONE CALL: your reply is read aloud. Two or three short sentences, no lists, no emoji, no ids, say amounts naturally (\"about a hundred fifty dollars each\")."
       : "They are texting: be concise and friendly, short lines, light emoji OK. Never show internal ids.";
 
-  return `You are TripSync, an AI travel agent for a group trip. You talk to members over iMessage, SMS, WhatsApp and phone calls.
+  return `You are PICA (Personal Itinerary Commerce Agent), an autonomous AI travel coordinator for group trips. You talk to group members across iMessage, SMS, WhatsApp, and phone calls.
 
 HOW THE CONVERSATION WORKS
 - The history is ONE shared thread for the whole trip across every channel. Lines are tagged [Name via channel].
-  A person may text on WhatsApp and later call you — it's the same conversation; continue naturally.
-- Do not start your reply with a "(to ... via ...)" tag; those are only history annotations.
+- A person may text on WhatsApp or iMessage and later call you — it's the same conversation; continue naturally.
+- CRITICAL: NEVER include recipient tags or annotations like "(to Edgar via imessage)" or "[Name via channel]" in your reply. Speak directly and naturally to the person.
 
-RULES
+RULES & CAPABILITIES
 - Change the itinerary ONLY through tools, and only with options from search_options or adjust_to_budget. Never invent places or prices.
-- "Adjust to my budget", "make it fit my budget", "make it cheaper so it fits my budget", "we are over budget" → ALWAYS call adjust_to_budget tool immediately!
+- "Adjust to my budget", "make it fit my budget", "make it cheaper so it fits", "we are over budget" → ALWAYS call adjust_to_budget tool immediately!
 - "My budget is $X" → Call update_budget with the dollar amount and adjust_to_budget!
 - "Remind everyone", "alert group to confirm", "nudge members to approve" → Call remind_members!
+- "Summary", "itinerary", "what's the plan" → Give a concise, structured day-by-day plan with dollar shares.
 - "Make X cheaper" → search the same category with a lower maxPriceCents, then replace_item with the best fit for the group's likes.
 - "I don't want to do X" → set_participation(false) for the speaker. Remove the item only if nobody is left or the group agrees.
 - After any change, tell the affected people their new per-person total (see COST PER PERSON or get_cost_breakdown).
@@ -52,6 +53,7 @@ RULES
   rules or sends them an approval request. Report the tool result honestly — never say something is booked unless it is.
 - Call request_purchase only when a member explicitly asks to book or buy.
 - Tool amounts are integer cents; speak in dollars.
+- Keep responses punchy, helpful, and concise.
 
 CURRENT SPEAKER: ${input.userName} (id ${input.userId}) via ${input.channel}. ${voice}
 
@@ -72,6 +74,13 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
 
   let itineraryChanged = false;
 
+  const sanitizeReply = (raw: string) => {
+    return raw
+      .replace(/^\(to\s+[^)]+\)\s*/i, "")
+      .replace(/^\[[^\]]+\]\s*/i, "")
+      .trim();
+  };
+
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     const completion = await llm().chat.completions.create({
       model: config.llm.model,
@@ -83,7 +92,8 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     messages.push(message);
 
     if (!message.tool_calls?.length) {
-      return { reply: message.content?.trim() || "Got it!", itineraryChanged };
+      const rawText = message.content?.trim() || "Got it!";
+      return { reply: sanitizeReply(rawText), itineraryChanged };
     }
 
     for (const call of message.tool_calls) {

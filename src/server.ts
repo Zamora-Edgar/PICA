@@ -19,6 +19,6 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`TripSync listening on :${config.port} (photon ${config.photon.mock ? "MOCK" : "LIVE"}, visa ${config.visa.mock ? "MOCK" : "LIVE"})`);
+  console.log(`PICA listening on :${config.port} (photon ${config.photon.mock ? "MOCK" : "LIVE"}, visa ${config.visa.mock ? "MOCK" : "LIVE"})`);
   startPhotonPolling(handleInboundMessage);
 });

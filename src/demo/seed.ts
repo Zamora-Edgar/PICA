@@ -3,7 +3,7 @@ import { linkDefaultIdentities } from "../identity";
 import { executeTool } from "../agent/tools";
 
 export async function seedDemoData(): Promise<void> {
-  console.log("🌱 Seeding TripSync database for Edgar, Omar, and Jairo...");
+  console.log("🌱 Seeding PICA database for Edgar, Omar, and Jairo...");
 
   await prisma.approvalRequest.deleteMany();
   await prisma.expenseSplit.deleteMany();

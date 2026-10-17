@@ -1,8 +1,8 @@
 {
-  "name": "tripsync",
+  "name": "pica",
   "version": "0.1.0",
   "private": true,
-  "description": "TripSync — group itinerary commerce agent (Photon 2.0 + Visa Intelligent Commerce)",
+  "description": "PICA — Personal Itinerary Commerce Agent (Photon 2.0 + Visa Intelligent Commerce)",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",

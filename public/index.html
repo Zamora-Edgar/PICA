@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TripSync — Autonomous Group Trip & Visa Commerce Agent</title>
+  <title>PICA — Personal Itinerary Commerce Agent</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: rgba(18, 24, 38, 0.75);
+      --bg: #070a12;
+      --card-bg: rgba(15, 23, 42, 0.7);
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-hover: rgba(255, 255, 255, 0.12);
+      --card-hover: rgba(59, 130, 246, 0.2);
       --primary: #3b82f6;
-      --primary-glow: rgba(59, 130, 246, 0.35);
+      --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
       --accent: #10b981;
-      --accent-glow: rgba(16, 185, 129, 0.3);
+      --accent-glow: rgba(16, 185, 129, 0.25);
       --visa-gold: #f59e0b;
-      --text: #f3f4f6;
-      --text-muted: #9ca3af;
+      --visa-glow: rgba(245, 158, 11, 0.2);
+      --purple: #8b5cf6;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
       --danger: #ef4444;
       --radius: 16px;
     }
@@ -28,20 +30,22 @@
     body {
       background: var(--bg);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+        radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12) 0px, transparent 45%),
+        radial-gradient(circle at 90% 20%, rgba(139, 92, 246, 0.10) 0px, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
       color: var(--text);
       font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
-      padding: 32px 24px;
+      padding: 24px 20px;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
     }
 
     /* Header */
@@ -57,38 +61,66 @@
     .logo-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
     .logo-badge {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      background: var(--primary-gradient);
       color: white;
-      font-weight: 800;
-      font-size: 20px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px var(--primary-glow);
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: -0.5px;
+      padding: 10px 18px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .logo-title h1 {
-      font-size: 26px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 800;
       letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .logo-title p {
       color: var(--text-muted);
       font-size: 13px;
+      margin-top: 2px;
     }
 
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       color: #34d399;
-      padding: 6px 14px;
+      padding: 7px 14px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .visa-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
     }
     .pulse-dot {
       width: 8px;
@@ -103,69 +135,182 @@
       50% { opacity: 0.4; transform: scale(0.85); }
     }
 
+    /* Action Control Bar */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      backdrop-filter: blur(10px);
+    }
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .btn-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .btn-warning:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    /* Metrics Strip */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .metric-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
     /* Hero Banner */
     .hero-banner {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.95));
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 24px 28px;
+      padding: 22px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 20px;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     }
     .hero-meta h2 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 6px;
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .hero-tags {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 13px;
+      flex-wrap: wrap;
     }
     .hero-tag {
       display: flex;
       align-items: center;
       gap: 6px;
       background: rgba(255, 255, 255, 0.05);
-      padding: 4px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 4px 12px;
       border-radius: 8px;
     }
 
     .photon-pill {
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
       padding: 12px 20px;
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       flex-direction: column;
       gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .photon-pill:hover {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(59, 130, 246, 0.4);
     }
     .photon-pill .label {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #93c5fd;
-      font-weight: 600;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .photon-pill .number {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 20px;
+      font-weight: 800;
       color: #60a5fa;
     }
 
-    /* Grid Layout */
+    /* Main Grid */
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr 380px;
       gap: 24px;
     }
-    @media (max-width: 900px) {
+    @media (max-width: 960px) {
       .main-grid { grid-template-columns: 1fr; }
     }
 
@@ -174,11 +319,12 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 22px;
       backdrop-filter: blur(16px);
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
     .card-header {
       display: flex;
@@ -186,7 +332,7 @@
       align-items: center;
     }
     .card-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -196,27 +342,43 @@
     /* Members Grid */
     .members-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 14px;
     }
     .member-item {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       transition: all 0.2s ease;
     }
     .member-item:hover {
-      border-color: var(--card-hover);
+      border-color: rgba(255, 255, 255, 0.16);
       background: rgba(255, 255, 255, 0.05);
     }
     .member-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+    .member-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .member-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: white;
     }
     .member-name {
       font-weight: 700;
@@ -226,9 +388,9 @@
       font-size: 11px;
       background: rgba(59, 130, 246, 0.15);
       color: #93c5fd;
-      padding: 2px 8px;
+      padding: 3px 8px;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
     }
     .member-phone {
@@ -236,19 +398,36 @@
       font-size: 12px;
       color: var(--text-muted);
     }
+    .member-progress-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .progress-bar-bg {
+      height: 6px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
     .member-costs {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding-top: 8px;
-      border-top: 1px dashed rgba(255, 255, 255, 0.06);
     }
     .share-amount {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
       color: #34d399;
     }
     .budget-limit {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
       color: var(--text-muted);
     }
@@ -257,17 +436,22 @@
     .itinerary-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .itinerary-item {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.025);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 16px 18px;
+      padding: 14px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
+      transition: all 0.2s ease;
+    }
+    .itinerary-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.12);
     }
     .item-meta {
       display: flex;
@@ -277,48 +461,74 @@
     .item-title-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .item-title {
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
+    }
+    .day-badge {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
     }
     .category-badge {
       font-size: 10px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 4px;
       text-transform: uppercase;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 0.3px;
     }
-    .cat-LODGING { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
-    .cat-FOOD { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-    .cat-ACTIVITY { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .cat-LODGING { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .cat-FOOD { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .cat-ACTIVITY { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .cat-TRANSPORT { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
     .item-desc {
       color: var(--text-muted);
-      font-size: 13px;
+      font-size: 12px;
     }
     .item-cost-box {
       text-align: right;
+      white-space: nowrap;
     }
     .item-total {
-      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
       font-size: 16px;
+      color: var(--text);
     }
     .item-split {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #34d399;
     }
 
     /* Visa Card Box */
     .visa-card {
-      background: linear-gradient(135deg, #1e3a8a, #0f172a);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      border-radius: 14px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 16px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+    .visa-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.2), transparent);
     }
     .visa-header {
       display: flex;
@@ -326,29 +536,33 @@
       align-items: center;
     }
     .visa-logo {
-      font-weight: 800;
-      font-size: 20px;
+      font-weight: 900;
+      font-size: 24px;
       font-style: italic;
       color: var(--visa-gold);
+      letter-spacing: -1px;
     }
     .visa-chip {
-      width: 32px;
-      height: 24px;
+      width: 34px;
+      height: 26px;
       background: linear-gradient(135deg, #d97706, #fbbf24);
-      border-radius: 4px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     .visa-token {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 15px;
       letter-spacing: 2px;
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
     }
     .visa-footer {
       display: flex;
       justify-content: space-between;
       font-size: 11px;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.6);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Guardrail Rules */
@@ -358,10 +572,11 @@
       gap: 10px;
       font-size: 13px;
       color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 8px 12px;
+      border-radius: 8px;
     }
-    .rule-icon {
-      font-size: 16px;
-    }
+    .rule-icon { font-size: 16px; }
 
     /* Message Timeline */
     .message-timeline {
@@ -372,63 +587,220 @@
       overflow-y: auto;
       padding-right: 4px;
     }
+    .message-timeline::-webkit-scrollbar {
+      width: 4px;
+    }
+    .message-timeline::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
     .msg-bubble {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 10px 14px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
       font-size: 13px;
+      transition: all 0.2s ease;
+    }
+    .msg-bubble:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .msg-bubble.is-pica {
+      border-left: 3px solid #3b82f6;
+      background: rgba(59, 130, 246, 0.05);
     }
     .msg-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 11px;
       color: var(--text-muted);
     }
     .msg-author {
-      font-weight: 600;
+      font-weight: 700;
       color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .msg-text {
-      line-height: 1.4;
+      line-height: 1.45;
       white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Web Interactive Simulator Box */
+    .interactive-box {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .interactive-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .sim-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .sim-select {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      outline: none;
+      font-family: inherit;
+    }
+    .sim-input {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      outline: none;
+      font-family: inherit;
+    }
+    .sim-input:focus {
+      border-color: #3b82f6;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      border: 1px solid #3b82f6;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Header -->
     <header>
       <div class="logo-group">
-        <div class="logo-badge">TripSync</div>
+        <div class="logo-badge">🌴 PICA</div>
         <div class="logo-title">
-          <h1>Autonomous Group Itinerary Commerce Agent</h1>
-          <p>Powered by Photon 2.0 Multi-Channel & Visa Intelligent Commerce</p>
+          <h1>Personal Itinerary Commerce Agent</h1>
+          <p>Autonomous Group Travel · Powered by Photon 2.0 & Visa Intelligent Commerce</p>
         </div>
       </div>
-      <div class="status-pill">
-        <div class="pulse-dot"></div>
-        <span>Live Cross-Channel Bridge Active</span>
+      <div class="header-badges">
+        <div class="status-pill">
+          <div class="pulse-dot"></div>
+          <span>Photon 2.0 Multi-Channel Live</span>
+        </div>
+        <div class="visa-pill">
+          <span>💳 Visa Intelligent Commerce</span>
+        </div>
       </div>
     </header>
 
+    <!-- Top Action Control Bar -->
+    <div class="action-bar">
+      <div class="action-group">
+        <button class="btn btn-primary" onclick="triggerAdjustBudget()">⚡ Auto-Optimize Budget</button>
+        <button class="btn btn-secondary" onclick="triggerRemindAll()">🔔 Remind Group</button>
+        <button class="btn btn-secondary" onclick="copyInviteLink()">📋 Copy Share Link</button>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted);" id="refresh-status">
+        Auto-syncing every 2.5s
+      </div>
+    </div>
+
+    <!-- Live Metrics Strip -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">💵 Total Itinerary</div>
+        <div class="metric-val" id="stat-total-cost">$0</div>
+        <div class="metric-sub" id="stat-item-count">0 items proposed</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">👥 Per-Person Average</div>
+        <div class="metric-val" id="stat-avg-cost">$0</div>
+        <div class="metric-sub" id="stat-split-count">Split equally among 3 travelers</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">🛡️ Budget Health</div>
+        <div class="metric-val" style="color: #34d399;" id="stat-budget-health">100% Fit</div>
+        <div class="metric-sub" id="stat-budget-cap">Lowest Member Cap: $300</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">✈️ Trip Countdown</div>
+        <div class="metric-val" style="color: #60a5fa;" id="stat-countdown">7 Days</div>
+        <div class="metric-sub">Oct 24, 2026 · San Diego, CA</div>
+      </div>
+    </div>
+
+    <!-- Hero Banner -->
     <div class="hero-banner">
       <div class="hero-meta">
         <h2 id="trip-name">San Diego Weekend Getaway</h2>
         <div class="hero-tags">
-          <div class="hero-tag">📍 <span id="trip-dest">San Diego</span></div>
+          <div class="hero-tag">📍 <span id="trip-dest">San Diego, CA</span></div>
           <div class="hero-tag">📅 <span id="trip-dates">Oct 24 – Oct 25, 2026</span></div>
           <div class="hero-tag">👥 <span id="member-count">3 Members</span></div>
+          <div class="hero-tag">☀️ 74°F Sunny & Breezy</div>
         </div>
       </div>
-      <div class="photon-pill">
-        <div class="label">Photon iMessage / SMS Line</div>
+      <div class="photon-pill" onclick="copyPhotonNumber()" title="Click to copy number">
+        <div class="label">💬 Text PICA on iMessage / SMS</div>
         <div class="number">+1 (628) 316-6196</div>
       </div>
     </div>
 
+    <!-- Main Grid -->
     <div class="main-grid">
       <!-- Left Column: Members & Itinerary -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -436,6 +808,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">👥 Group Members & Fair Share Split</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Real-time budget utilization</div>
           </div>
           <div class="members-grid" id="members-list">
             <!-- Dynamic members injected here -->
@@ -445,8 +818,8 @@
         <!-- Itinerary Card -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">🗺️ Group Itinerary & Cost Splits</div>
-            <div style="font-size: 14px; font-weight: 700; color: #34d399;" id="total-trip-cost">$0</div>
+            <div class="card-title">🗺️ Group Itinerary & Cost Breakdown</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 800; color: #34d399;" id="total-trip-cost">$0.00</div>
           </div>
           <div class="itinerary-list" id="itinerary-list">
             <!-- Dynamic items injected here -->
@@ -454,7 +827,7 @@
         </div>
       </div>
 
-      <!-- Right Column: Visa Vault & Live Feed -->
+      <!-- Right Column: Visa Guardrails & Live Feed -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
         <!-- Visa Guardrail Card -->
         <div class="card">
@@ -468,75 +841,238 @@
             </div>
             <div class="visa-token">•••• •••• •••• 8821</div>
             <div class="visa-footer">
-              <div>Agent Auth Token</div>
+              <div>Agent Auth Scoped Token</div>
               <div>Expires: 10/28</div>
             </div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <div class="rule-item">
               <div class="rule-icon">⚡</div>
-              <div><strong>Auto-Purchase:</strong> Up to $50/person</div>
+              <div><strong>Auto-Purchase:</strong> Up to $50/person instantly</div>
             </div>
             <div class="rule-item">
               <div class="rule-icon">🛡️</div>
-              <div><strong>Approval Required:</strong> $50 – $300</div>
+              <div><strong>Approval Required:</strong> $50 – $300 (via SMS 2FA)</div>
             </div>
             <div class="rule-item">
               <div class="rule-icon">🚫</div>
-              <div><strong>Hard Ceiling Cap:</strong> Over $1,000</div>
+              <div><strong>Hard Ceiling Cap:</strong> Over $1,000 strictly blocked</div>
             </div>
           </div>
         </div>
 
-        <!-- Live Cross-Channel Feed -->
+        <!-- Live Cross-Channel Feed & Web Console -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">📡 Live Multi-Channel Thread</div>
+            <div style="font-size: 11px; color: #34d399;">● LIVE</div>
           </div>
+          
           <div class="message-timeline" id="message-feed">
-            <div style="color: var(--text-muted); font-size: 13px;">Listening for messages via Photon...</div>
+            <div style="color: var(--text-muted); font-size: 13px;">Listening for messages via Photon 2.0...</div>
+          </div>
+
+          <!-- Interactive Test Console -->
+          <div class="interactive-box">
+            <div class="interactive-header">
+              <span>Interactive PICA Console</span>
+              <span>Test Commands</span>
+            </div>
+            <div class="quick-chips">
+              <span class="chip" onclick="quickSend('Summary')">Summary</span>
+              <span class="chip" onclick="quickSend('Adjust to my budget')">Adjust to budget</span>
+              <span class="chip" onclick="quickSend('Remind everyone')">Remind group</span>
+              <span class="chip" onclick="quickSend('My budget is $300')">My budget is $300</span>
+            </div>
+            <div class="sim-input-row">
+              <select class="sim-select" id="sim-user">
+                <option value="edgar">Edgar</option>
+                <option value="omar">Omar</option>
+                <option value="jairo">Jairo</option>
+              </select>
+              <input type="text" class="sim-input" id="sim-text" placeholder="Type a message or command..." onkeydown="if(event.key==='Enter') sendSimMessage()">
+              <button class="btn btn-primary" style="padding: 6px 12px;" onclick="sendSimMessage()">Send</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <div id="toast">Action triggered!</div>
+
   <script>
+    let activeTripData = null;
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function copyPhotonNumber() {
+      navigator.clipboard.writeText('+16283166196');
+      showToast('Copied Photon number +1 (628) 316-6196 to clipboard!');
+    }
+
+    function copyInviteLink() {
+      if (activeTripData && activeTripData.trip && activeTripData.trip.inviteUrl) {
+        navigator.clipboard.writeText(activeTripData.trip.inviteUrl);
+        showToast('Copied invite link: ' + activeTripData.trip.inviteUrl);
+      } else {
+        navigator.clipboard.writeText(window.location.origin);
+        showToast('Copied trip link to clipboard!');
+      }
+    }
+
+    async function triggerAdjustBudget() {
+      try {
+        showToast('⚡ Optimizing trip to lowest budget...');
+        const res = await fetch('/api/active/adjust-budget', { method: 'POST' });
+        if (res.ok) {
+          showToast('✅ Trip adjusted to fit budget! Broadcast sent to group.');
+          await loadDashboard();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function triggerRemindAll() {
+      try {
+        showToast('🔔 Sending reminder alerts to group...');
+        const res = await fetch('/api/active/remind', { method: 'POST' });
+        if (res.ok) {
+          showToast('✅ Sent reminders to all members!');
+          await loadDashboard();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function quickSend(txt) {
+      document.getElementById('sim-text').value = txt;
+      sendSimMessage();
+    }
+
+    async function sendSimMessage() {
+      const input = document.getElementById('sim-text');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const userSel = document.getElementById('sim-user').value;
+      let userId;
+      if (activeTripData && activeTripData.trip && activeTripData.trip.members) {
+        const found = activeTripData.trip.members.find(m => m.user.name.toLowerCase().includes(userSel));
+        if (found) userId = found.userId;
+      }
+
+      showToast(`Sending: "${text}"...`);
+      try {
+        await fetch('/api/active/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, userId })
+        });
+        setTimeout(loadDashboard, 800);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    const AVATAR_COLORS = [
+      'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+      'linear-gradient(135deg, #10b981, #059669)',
+      'linear-gradient(135deg, #f59e0b, #d97706)',
+      'linear-gradient(135deg, #8b5cf6, #6d28d9)'
+    ];
+
     async function loadDashboard() {
       try {
         const res = await fetch('/api/active');
         if (!res.ok) return;
         const data = await res.json();
+        activeTripData = data;
         const { trip, costs, messages } = data;
 
         document.getElementById('trip-name').textContent = trip.name;
-        document.getElementById('trip-dest').textContent = trip.destination;
+        document.getElementById('trip-dest').textContent = trip.destination + ', CA';
         document.getElementById('member-count').textContent = `${trip.members.length} Members`;
 
-        // Total cost
-        const totalCents = trip.items.reduce((sum, item) => sum + (item.priceCents || 0), 0);
-        document.getElementById('total-trip-cost').textContent = `Total: $${(totalCents / 100).toFixed(2)}`;
+        // Total cost calculation
+        const activeItems = (trip.items || []).filter(it => it.status !== 'REMOVED');
+        const totalCents = activeItems.reduce((sum, item) => sum + (item.priceCents || 0), 0);
+        const totalUsd = (totalCents / 100).toFixed(2);
+        document.getElementById('total-trip-cost').textContent = `Total: $${totalUsd}`;
+        document.getElementById('stat-total-cost').textContent = `$${totalUsd}`;
+        document.getElementById('stat-item-count').textContent = `${activeItems.length} active itinerary items`;
+
+        // Average cost
+        const memberCount = trip.members.length || 1;
+        const avgUsd = (totalCents / 100 / memberCount).toFixed(2);
+        document.getElementById('stat-avg-cost').textContent = `$${avgUsd}`;
+
+        // Budget Health
+        let maxUsage = 0;
+        let lowestBudget = 999999;
+        costs.forEach(c => {
+          const cap = c.budgetCents || 40000;
+          if (cap < lowestBudget) lowestBudget = cap;
+          const ratio = c.totalCents / cap;
+          if (ratio > maxUsage) maxUsage = ratio;
+        });
+        const healthEl = document.getElementById('stat-budget-health');
+        if (maxUsage <= 1.0) {
+          healthEl.textContent = '100% Fit';
+          healthEl.style.color = '#34d399';
+        } else {
+          healthEl.textContent = 'Over Cap';
+          healthEl.style.color = '#ef4444';
+        }
+        document.getElementById('stat-budget-cap').textContent = `Lowest Member Cap: $${(lowestBudget / 100).toFixed(0)}`;
 
         // Members Render
         const membersList = document.getElementById('members-list');
-        membersList.innerHTML = trip.members.map(m => {
+        membersList.innerHTML = trip.members.map((m, idx) => {
           const costInfo = costs.find(c => c.userId === m.user.id) || { totalCents: 0, budgetCents: 40000 };
           const shareUsd = (costInfo.totalCents / 100).toFixed(2);
           const budgetUsd = (costInfo.budgetCents / 100).toFixed(0);
+          const ratio = Math.min(100, Math.round((costInfo.totalCents / (costInfo.budgetCents || 40000)) * 100));
+          const fillColor = ratio > 100 ? '#ef4444' : ratio > 85 ? '#f59e0b' : '#10b981';
+          const initials = m.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+          const avatarBg = AVATAR_COLORS[idx % AVATAR_COLORS.length];
+
           return `
             <div class="member-item">
               <div class="member-top">
-                <span class="member-name">${m.user.name}</span>
+                <div class="member-profile">
+                  <div class="member-avatar" style="background: ${avatarBg};">${initials}</div>
+                  <div>
+                    <div class="member-name">${m.user.name} ${m.role === 'ORGANIZER' ? '👑' : ''}</div>
+                    <div class="member-phone">${m.user.phoneE164}</div>
+                  </div>
+                </div>
                 <span class="member-channel">${m.user.preferredChannel}</span>
               </div>
-              <div class="member-phone">${m.user.phoneE164}</div>
+              <div class="member-progress-wrap">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                  <span>Budget Utilization</span>
+                  <span>${ratio}%</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width: ${ratio}%; background: ${fillColor};"></div>
+                </div>
+              </div>
               <div class="member-costs">
                 <div>
                   <div style="font-size: 11px; color: var(--text-muted);">Current Share</div>
                   <div class="share-amount">$${shareUsd}</div>
                 </div>
                 <div style="text-align: right;">
-                  <div style="font-size: 11px; color: var(--text-muted);">Budget Cap</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Cap Limit</div>
                   <div class="budget-limit">$${budgetUsd}</div>
                 </div>
               </div>
@@ -546,20 +1082,21 @@
 
         // Itinerary Render
         const itList = document.getElementById('itinerary-list');
-        itList.innerHTML = trip.items.map(it => {
-          const totalUsd = (it.priceCents / 100).toFixed(2);
-          const perPersonUsd = (it.priceCents / 100 / trip.members.length).toFixed(2);
+        itList.innerHTML = activeItems.map(it => {
+          const itemTotalUsd = (it.priceCents / 100).toFixed(2);
+          const perPersonUsd = (it.priceCents / 100 / memberCount).toFixed(2);
           return `
             <div class="itinerary-item">
               <div class="item-meta">
                 <div class="item-title-row">
+                  <span class="day-badge">Day ${it.dayIndex}</span>
                   <span class="item-title">${it.title}</span>
                   <span class="category-badge cat-${it.category}">${it.category}</span>
                 </div>
                 <div class="item-desc">${it.description || it.merchantName}</div>
               </div>
               <div class="item-cost-box">
-                <div class="item-total">$${totalUsd}</div>
+                <div class="item-total">$${itemTotalUsd}</div>
                 <div class="item-split">$${perPersonUsd}/person</div>
               </div>
             </div>
@@ -569,15 +1106,19 @@
         // Message Feed Render
         const feed = document.getElementById('message-feed');
         if (messages && messages.length > 0) {
-          feed.innerHTML = messages.map(msg => `
-            <div class="msg-bubble">
-              <div class="msg-header">
-                <span class="msg-author">${msg.direction === 'INBOUND' ? '👤 ' + (msg.user?.name || 'User') : '✈️ TripSync Agent'}</span>
-                <span>${msg.channel.toUpperCase()}</span>
+          feed.innerHTML = messages.map(msg => {
+            const isPica = msg.direction === 'OUTBOUND';
+            const author = isPica ? '🌴 PICA Agent' : (msg.user?.name || 'Member');
+            return `
+              <div class="msg-bubble ${isPica ? 'is-pica' : ''}">
+                <div class="msg-header">
+                  <span class="msg-author">${isPica ? '⚡ ' : '👤 '}${author}</span>
+                  <span>${(msg.channel || 'imessage').toUpperCase()}</span>
+                </div>
+                <div class="msg-text">${msg.body}</div>
               </div>
-              <div class="msg-text">${msg.body}</div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         }
       } catch (err) {
         console.warn('Dashboard fetch error:', err);
@@ -585,7 +1126,7 @@
     }
 
     loadDashboard();
-    setInterval(loadDashboard, 3000);
+    setInterval(loadDashboard, 2500);
   </script>
 </body>
 </html>

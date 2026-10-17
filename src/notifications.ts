@@ -66,7 +66,7 @@ export async function broadcastItineraryUpdate(tripId: string, updatedByUserId: 
 
     const cleanReason = reasonSummary.replace(/\n+/g, " ").slice(0, 100);
     const broadcastMsg =
-      `📢 TripSync Itinerary Update!\n` +
+      `📢 PICA Itinerary Update!\n` +
       `📍 ${updater} changed the plan: ${cleanReason}\n\n` +
       `Current Itinerary:\n${itemsText || "(No items)"}\n\n` +
       `💵 Your updated share: ${shareText}${budgetText}\n` +

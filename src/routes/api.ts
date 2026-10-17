@@ -109,7 +109,7 @@ apiRouter.post("/invites/:code/join", handle(async (req, res) => {
   }
 
   const callLine = config.photon.voiceNumber ? ` or call ${config.photon.voiceNumber}` : "";
-  await notifyUser(user.id, `Welcome to ${trip.name}, ${user.name}! I'm TripSync ✈️ Text me here${callLine} anytime to shape the plan.`, trip.id);
+  await notifyUser(user.id, `Welcome to ${trip.name}, ${user.name}! I'm PICA 🌴 Text me here${callLine} anytime to shape the plan.`, trip.id);
   res.status(201).json({ userId: user.id, tripId: trip.id });
 }));
 
@@ -145,8 +145,57 @@ apiRouter.get("/active", handle(async (_req, res) => {
   const messages = await prisma.message.findMany({
     where: { tripId: trip.id },
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 25,
     include: { user: true },
   });
   res.json({ trip: snapshot, costs: computeCostBreakdown(snapshot), messages });
+}));
+
+// Dashboard Action: Nudge / Remind all members to confirm
+apiRouter.post("/active/remind", handle(async (req, res) => {
+  const trip = await prisma.trip.findFirst({ where: { status: { in: ["PLANNING", "BOOKING"] } }, orderBy: { createdAt: "desc" } });
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const organizerId = trip.organizerId;
+  const { executeTool } = await import("../agent/tools");
+  const result = await executeTool("remind_members", { memberName: "all" }, { tripId: trip.id, userId: organizerId });
+  res.json({ ok: true, result });
+}));
+
+// Dashboard Action: Auto-adjust to lowest budget
+apiRouter.post("/active/adjust-budget", handle(async (req, res) => {
+  const trip = await prisma.trip.findFirst({ where: { status: { in: ["PLANNING", "BOOKING"] } }, orderBy: { createdAt: "desc" } });
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const organizerId = trip.organizerId;
+  const { executeTool } = await import("../agent/tools");
+  const { broadcastItineraryUpdate } = await import("../notifications");
+  const result = await executeTool("adjust_to_budget", {}, { tripId: trip.id, userId: organizerId });
+  if (result.itineraryChanged) {
+    await broadcastItineraryUpdate(trip.id, organizerId, "Dashboard budget optimization");
+  }
+  res.json({ ok: true, result });
+}));
+
+// Dashboard Action: Send a message into the conversation thread (from web)
+apiRouter.post("/active/message", handle(async (req, res) => {
+  const { text, userId } = z.object({ text: z.string().min(1), userId: z.string().optional() }).parse(req.body);
+  const trip = await prisma.trip.findFirst({
+    where: { status: { in: ["PLANNING", "BOOKING"] } },
+    include: { members: { include: { user: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+
+  const activeUserId = userId || trip.organizerId;
+  const member = trip.members.find((m) => m.userId === activeUserId) || trip.members[0];
+  const { handleInboundMessage } = await import("../webhooks/photonWebhook");
+
+  await handleInboundMessage({
+    eventId: `web_${Date.now()}`,
+    channel: (member.user.preferredChannel as any) || "imessage",
+    from: member.user.phoneE164,
+    to: config.photon.agentHandle,
+    text,
+  });
+
+  res.json({ ok: true });
 }));

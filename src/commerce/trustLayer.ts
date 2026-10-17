@@ -86,7 +86,7 @@ export function evaluatePurchase(
       name: "AGENT_TOKEN_LINKED",
       passed: ctx.hasAgentToken,
       onFail: "DECLINE",
-      detail: "You haven't linked a Visa card for TripSync payments yet.",
+      detail: "You haven't linked a Visa card for PICA payments yet.",
     },
     {
       name: "MERCHANT_NOT_BLOCKED",

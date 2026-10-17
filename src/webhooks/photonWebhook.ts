@@ -61,7 +61,7 @@ export async function handleInboundMessage(event: PhotonInboundEvent): Promise<v
   // 1. Who is this? Same person on WhatsApp, iMessage or a voice call → same User.
   const user = await resolveUser(event.channel, event.from);
   if (!user) {
-    await reply("Hi! I'm TripSync ✈️ I don't recognize this number yet — ask your trip organizer for an invite link to join.");
+    await reply("Hi! I'm PICA 🌴 (Personal Itinerary Commerce Agent). I don't recognize this number yet — ask your trip organizer for an invite link to join.");
     return;
   }
 
@@ -98,6 +98,50 @@ export async function handleInboundMessage(event: PhotonInboundEvent): Promise<v
 
   if (approval.handled) {
     replyText = approval.reply;
+  } else if (lower === "help" || lower === "commands" || lower === "menu") {
+    // Fast path: Help / Commands
+    replyText = `🌴 PICA Commands Quick Guide:\n\n` +
+      `• "Summary" → View full itinerary & group splits\n` +
+      `• "Budget" → Check your spend vs budget cap\n` +
+      `• "Adjust to my budget" → Auto-rebalance items to fit your budget\n` +
+      `• "My budget is $300" → Update your budget limit\n` +
+      `• "Remind everyone" → Alert group members to confirm\n` +
+      `• "Make [item] cheaper" → Swap for an affordable option\n` +
+      `• "Book [item]" → Trigger Visa trust layer purchase`;
+  } else if (lower === "summary" || lower === "itinerary" || lower === "plan" || lower === "show plan" || lower === "what's the plan" || lower === "what is the plan") {
+    // Fast path: Instant structured summary
+    const { loadTripSnapshot, computeCostBreakdown } = await import("../agent/tripContext");
+    const { formatUsd } = await import("../domain/types");
+    const snapshot = await loadTripSnapshot(trip.id);
+    const costs = computeCostBreakdown(snapshot);
+    const myCost = costs.find((c) => c.userId === user.id);
+    const activeItems = snapshot.items.filter((i) => i.status !== "REMOVED");
+    const itemsList = activeItems.map((it) => `• Day ${it.dayIndex}: ${it.title} (${formatUsd(it.priceCents)})`).join("\n");
+    const splitsList = costs.map((c) => `• ${c.name}: ${formatUsd(c.totalCents)} / cap ${formatUsd(c.budgetCents || 0)}`).join("\n");
+
+    replyText = `🌴 PICA Trip Summary: ${snapshot.name}\n` +
+      `📍 ${snapshot.destination}\n\n` +
+      `🗓️ Itinerary:\n${itemsList || "(No items)"}\n\n` +
+      `💵 Your Share: ${formatUsd(myCost?.totalCents || 0)}\n\n` +
+      `👥 Group Splits:\n${splitsList}\n\n` +
+      `Text "YES" to confirm, or ask me to adjust anything!`;
+  } else if (lower === "budget" || lower === "my budget" || lower === "costs" || lower === "my share" || lower === "cost breakdown") {
+    // Fast path: Instant budget report
+    const { loadTripSnapshot, computeCostBreakdown } = await import("../agent/tripContext");
+    const { formatUsd } = await import("../domain/types");
+    const snapshot = await loadTripSnapshot(trip.id);
+    const costs = computeCostBreakdown(snapshot);
+    const myCost = costs.find((c) => c.userId === user.id);
+    const budgetCents = myCost?.budgetCents || 40000;
+    const totalCents = myCost?.totalCents || 0;
+    const diff = budgetCents - totalCents;
+    const statusStr = diff >= 0 ? `✅ $${(diff / 100).toFixed(0)} under budget` : `⚠️ $${(Math.abs(diff) / 100).toFixed(0)} over budget`;
+
+    replyText = `💳 PICA Budget Status for ${user.name}:\n\n` +
+      `• Current Share: ${formatUsd(totalCents)}\n` +
+      `• Budget Cap: ${formatUsd(budgetCents)}\n` +
+      `• Status: ${statusStr}\n\n` +
+      `Need it lower? Just text "adjust to my budget"!`;
   } else if (lower.includes("remind everyone") || lower.includes("alert everyone") || lower.includes("nudge everyone") || lower.startsWith("remind ") || lower.startsWith("alert ")) {
     // Fast path: Remind members
     const targetMatch = lower.match(/(?:remind|alert|nudge)\s+([a-zA-Z]+)/);

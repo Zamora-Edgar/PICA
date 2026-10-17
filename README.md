@@ -1,4 +1,4 @@
-# TripSync — Personal Itinerary Commerce Agent
+# PICA — Personal Itinerary Commerce Agent
 
 An AI agent that plans group trips over **iMessage, SMS, WhatsApp and voice** (Photon 2.0), keeps per-person costs up to date as the plan changes, and books things through **Visa Intelligent Commerce**. It spends only within each person's own rules, and asks a person before spending anything outside them.
 

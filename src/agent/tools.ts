@@ -311,7 +311,7 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
         const note = args.message ? `\n"${args.message}"` : "";
 
         const reminderText =
-          `🔔 TripSync Reminder from ${speaker}!\n` +
+          `🔔 PICA Reminder from ${speaker}!\n` +
           `Hey ${target.user.name}! We're reviewing our trip "${trip.name}". Your current share is $${shareUsd}.${note}\n\n` +
           `Reply "YES" to confirm your share, or text any adjustments!`;
 

@@ -166,7 +166,7 @@ async function authorizeSplit(splitId: string, consent: visa.ConsentEvidence): P
     amountCents: split.amountCents,
     currency: split.item.currency,
     merchant: { name: split.item.merchantName, visaMerchantId: split.item.visaMerchantId },
-    description: `TripSync: ${split.item.title} (share for ${split.user.name})`,
+    description: `PICA: ${split.item.title} (share for ${split.user.name})`,
     idempotencyKey: `split_${split.id}`,
     consent,
   });

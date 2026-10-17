@@ -174,7 +174,7 @@ export function startPhotonPolling(onMessage: (event: PhotonInboundEvent) => Pro
   const processedMessageIds = new Set<string>();
   let createdSince = new Date(Date.now() - 5000).toISOString();
 
-  console.log(`📡 TripSync Photon 2.0 Poller starting for project: ${projectId}`);
+  console.log(`📡 PICA Photon 2.0 Poller starting for project: ${projectId}`);
 
   const poll = async () => {
     try {
