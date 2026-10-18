@@ -6,7 +6,7 @@
  */
 import type { ItemCategory } from "../domain/types";
 
-export type DestinationCity = "San Diego" | "New York" | "Florida";
+export type DestinationCity = string;
 
 export interface CatalogOption {
   id: string;
@@ -21,12 +21,9 @@ export interface CatalogOption {
 
 export function matchesDestination(optionDest: DestinationCity, targetDest?: string | null): boolean {
   if (!targetDest) return true;
-  const t = targetDest.toLowerCase();
-  const o = optionDest.toLowerCase();
-  if (t.includes("san diego") || t.includes("sd") || t.includes("california")) return o === "san diego";
-  if (t.includes("new york") || t.includes("nyc") || t.includes("manhattan") || t.includes("ny")) return o === "new york";
-  if (t.includes("florida") || t.includes("miami") || t.includes("orlando") || t.includes("key west") || t.includes("fl")) return o === "florida";
-  return o.includes(t) || t.includes(o);
+  const t = targetDest.toLowerCase().trim();
+  const o = optionDest.toLowerCase().trim();
+  return o === t || o.includes(t) || t.includes(o);
 }
 
 export const CATALOG: CatalogOption[] = [

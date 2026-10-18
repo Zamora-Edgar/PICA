@@ -121,37 +121,22 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
 
   switch (name as ToolName) {
     case "change_destination": {
-      const raw = String(args.destination || "").toLowerCase();
-      let city = "San Diego";
-      let fullName = "San Diego Weekend Getaway";
+      const query = String(args.destination || "").trim();
+      let city = query;
+      let fullName = `${query} Adventure`;
       let customOptions: any[] = [];
 
-      if (raw.includes("new york") || raw.includes("nyc") || raw.includes("manhattan") || raw.includes("ny")) {
-        city = "New York";
-        fullName = "New York City Explorer";
-      } else if (raw.includes("florida") || raw.includes("miami") || raw.includes("orlando") || raw.includes("key west") || raw.includes("fl")) {
-        city = "Florida";
-        fullName = "Florida Sunshine Getaway";
-      } else if (raw.includes("san diego") || raw.includes("sd") || raw.includes("california")) {
-        city = "San Diego";
-        fullName = "San Diego Weekend Getaway";
-      } else {
-        // 🌍 Global discovery via LocationIQ
-        try {
-          const discovered = await discoverGlobalDestination(args.destination);
-          if (discovered && discovered.options.length > 0) {
-            city = discovered.location.city;
-            fullName = `${discovered.location.city} Adventure`;
-            registerDynamicOptions(discovered.options);
-            customOptions = discovered.options;
-          } else {
-            city = args.destination.trim();
-            fullName = `${city} Group Getaway`;
-          }
-        } catch (e) {
-          city = args.destination.trim();
-          fullName = `${city} Group Getaway`;
+      // 🌍 Global discovery via LocationIQ for ANY destination (no limits)
+      try {
+        const discovered = await discoverGlobalDestination(query);
+        if (discovered && discovered.options.length > 0) {
+          city = discovered.location.city;
+          fullName = `${discovered.location.city} Adventure`;
+          registerDynamicOptions(discovered.options);
+          customOptions = discovered.options;
         }
+      } catch (e) {
+        console.warn("LocationIQ discovery fallback:", e);
       }
 
       const tripName = args.tripName || fullName;
@@ -169,22 +154,34 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
 
       // Auto-seed starter hotel for the new destination
       const availableOptions = customOptions.length > 0 ? customOptions : getAllCatalogOptions().filter((o) => matchesDestination(o.destination, city));
-      const starterHotel = availableOptions.find((o) => o.category === "LODGING") || availableOptions[0];
+      let starterHotel = availableOptions.find((o) => o.category === "LODGING") || availableOptions[0];
 
-      if (starterHotel) {
-        await prisma.itineraryItem.create({
-          data: {
-            tripId: ctx.tripId,
-            dayIndex: 1,
-            category: starterHotel.category,
-            title: starterHotel.title,
-            description: starterHotel.description,
-            catalogOptionId: starterHotel.id,
-            merchantName: starterHotel.merchantName,
-            priceCents: starterHotel.priceCents,
-          },
-        });
+      if (!starterHotel) {
+        starterHotel = {
+          id: `dyn_htl_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+          destination: city,
+          category: "LODGING",
+          title: `${city} City Center Suite (2 nights)`,
+          merchantName: `${city} Grand Hotel`,
+          priceCents: 60_000,
+          description: `Prime central suite located in downtown ${city}`,
+          tags: ["hotel", "central", city.toLowerCase()],
+        };
+        registerDynamicOptions([starterHotel]);
       }
+
+      await prisma.itineraryItem.create({
+        data: {
+          tripId: ctx.tripId,
+          dayIndex: 1,
+          category: starterHotel.category,
+          title: starterHotel.title,
+          description: starterHotel.description,
+          catalogOptionId: starterHotel.id,
+          merchantName: starterHotel.merchantName,
+          priceCents: starterHotel.priceCents,
+        },
+      });
 
       return {
         data: {

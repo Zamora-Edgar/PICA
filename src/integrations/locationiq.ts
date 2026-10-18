@@ -27,7 +27,7 @@ export async function geocodeCity(query: string): Promise<GeoLocation | null> {
   if (!apiKey) return null;
 
   try {
-    const url = `${BASE_URL}/search.php?key=${apiKey}&q=${encodeURIComponent(query)}&format=json&limit=1`;
+    const url = `${BASE_URL}/search.php?key=${apiKey}&q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1`;
     const res = await fetch(url);
     if (!res.ok) {
       console.warn(`LocationIQ geocode error: HTTP ${res.status}`);
@@ -37,9 +37,11 @@ export async function geocodeCity(query: string): Promise<GeoLocation | null> {
     if (!Array.isArray(data) || data.length === 0) return null;
 
     const top = data[0];
-    const parts = (top.display_name || query).split(",").map((s: string) => s.trim());
-    const city = parts[0] || query;
-    const country = parts[parts.length - 1] || "";
+    const addr = top.address || {};
+    // If the user typed an English city name like Tokyo, Paris, Rome, preserve it
+    const englishName = addr["name:en"] || (query.match(/^[a-zA-Z\s'-]+$/) ? query.trim() : null);
+    const city = englishName || addr.city || addr.town || addr.municipality || addr.village || addr.state || top.display_name?.split(",")[0]?.trim() || query;
+    const country = addr.country || "";
 
     return {
       name: city,

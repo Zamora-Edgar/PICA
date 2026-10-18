@@ -175,8 +175,25 @@ const activeTrip = () =>
 apiRouter.get("/active/recommendations", handle(async (req, res) => {
   const trip = await activeTrip();
   if (!trip) return res.status(404).json({ error: "No active trip" });
+
+  if (trip.destination) {
+    const { getAllCatalogOptions, registerDynamicOptions, matchesDestination } = await import("../agent/catalog");
+    const existing = getAllCatalogOptions().filter((o) => matchesDestination(o.destination, trip.destination));
+    if (existing.length === 0) {
+      try {
+        const { discoverGlobalDestination } = await import("../integrations/locationiq");
+        const discovered = await discoverGlobalDestination(trip.destination);
+        if (discovered && discovered.options.length > 0) {
+          registerDynamicOptions(discovered.options);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch recommendations from LocationIQ", err);
+      }
+    }
+  }
+
   const category = z.enum(ITEM_CATEGORIES).optional().parse(req.query.category || undefined);
-  res.json(recommendForTrip(await loadTripSnapshot(trip.id), await getMerchantOffers(), { category, limit: 4 }));
+  res.json(recommendForTrip(await loadTripSnapshot(trip.id), await getMerchantOffers(), { category, limit: 6 }));
 }));
 
 // Add a recommended option to the plan.
