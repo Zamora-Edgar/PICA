@@ -27,7 +27,9 @@ export async function geocodeCity(query: string): Promise<GeoLocation | null> {
   if (!apiKey) return null;
 
   try {
-    const url = `${BASE_URL}/search.php?key=${apiKey}&q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1`;
+    const qClean = query.trim();
+    const effectiveQuery = qClean.toLowerCase() === "japan" ? "Tokyo, Japan" : qClean;
+    const url = `${BASE_URL}/search.php?key=${apiKey}&q=${encodeURIComponent(effectiveQuery)}&format=json&limit=1&addressdetails=1`;
     const res = await fetch(url);
     if (!res.ok) {
       console.warn(`LocationIQ geocode error: HTTP ${res.status}`);
@@ -39,8 +41,8 @@ export async function geocodeCity(query: string): Promise<GeoLocation | null> {
     const top = data[0];
     const addr = top.address || {};
     // If the user typed an English city name like Tokyo, Paris, Rome, preserve it
-    const englishName = addr["name:en"] || (query.match(/^[a-zA-Z\s'-]+$/) ? query.trim() : null);
-    const city = englishName || addr.city || addr.town || addr.municipality || addr.village || addr.state || top.display_name?.split(",")[0]?.trim() || query;
+    const englishName = addr["name:en"] || (effectiveQuery.match(/^[a-zA-Z\s'-]+$/) ? effectiveQuery : null);
+    const city = englishName || addr.city || addr.town || addr.municipality || addr.village || addr.state || top.display_name?.split(",")[0]?.trim() || effectiveQuery;
     const country = addr.country || "";
 
     return {
@@ -72,16 +74,16 @@ export async function fetchNearbyPlaces(
   // OpenStreetMap tags mapping
   let tag = "tourism:hotel";
   let itemCategory: ItemCategory = "LODGING";
-  let basePriceCents = 60_000; // ~$200/person for 3
+  let basePriceCents = 45_000; // ~$150/person for 3 for the 5-day stay
 
   if (category === "activity") {
     tag = "tourism:attraction";
     itemCategory = "ACTIVITY";
-    basePriceCents = 24_000; // ~$80/person for 3
+    basePriceCents = 6_000; // ~$20/person for 3
   } else if (category === "food") {
     tag = "amenity:restaurant";
     itemCategory = "FOOD";
-    basePriceCents = 15_000; // ~$50/person for 3
+    basePriceCents = 6_000; // ~$20/person for 3
   }
 
   try {
@@ -96,10 +98,10 @@ export async function fetchNearbyPlaces(
 
     return places
       .filter((p: any) => p.name && p.name.trim().length > 2)
-      .slice(0, 4)
+      .slice(0, 8)
       .map((p: any, idx: number) => {
         const id = `liq_${category}_${p.place_id || idx}_${Math.abs(Math.round(lat * 100))}`;
-        const priceVariance = (idx === 0 ? 1.3 : idx === 1 ? 1.0 : idx === 2 ? 0.6 : 0.4);
+        const priceVariance = (idx === 0 ? 1.2 : idx === 1 ? 1.0 : idx === 2 ? 0.8 : 0.6);
         const priceCents = Math.round(basePriceCents * priceVariance);
 
         let desc = `${p.type || category} in ${cityName}`;
@@ -112,7 +114,7 @@ export async function fetchNearbyPlaces(
           id,
           destination: cityName as any,
           category: itemCategory,
-          title: itemCategory === "LODGING" ? `${p.name} Suite (2 nights)` : p.name,
+          title: itemCategory === "LODGING" ? `${p.name} Suite (4 nights · 5 days)` : p.name,
           merchantName: p.name,
           priceCents,
           description: desc,

@@ -536,6 +536,14 @@
           document.getElementById('trip-dest').textContent = trip.destination;
           loadDestinationImage(trip.destination);
         }
+        if (trip.startDate && trip.endDate) {
+          const s = new Date(trip.startDate);
+          const e = new Date(trip.endDate);
+          const fmt = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const year = e.getFullYear();
+          const diffDays = Math.max(1, Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+          document.getElementById('trip-dates').textContent = `${fmt(s)} – ${fmt(e)}, ${year} (${diffDays} Days)`;
+        }
         if (trip.members) document.getElementById('member-count').textContent = `${trip.members.length} Members`;
 
         const activeItems = (trip.items || []).filter(it => it.status !== 'REMOVED');
@@ -618,18 +626,51 @@
           feed.scrollTop = feed.scrollHeight;
         }
 
-        document.getElementById('itinerary-list').innerHTML = activeItems.map(it => `
-          <div class="itinerary-item">
-            <div>
-              <div style="font-weight: 800; font-size: 14px; color: #1e293b; margin-bottom: 4px;">${it.title}</div>
-              <div style="font-size: 12px; color: var(--text-muted);">${it.description || it.merchantName}</div>
+        const sortedItems = activeItems.slice().sort((a, b) => (a.dayIndex || 1) - (b.dayIndex || 1));
+        const dayGroups = {};
+        for (const it of sortedItems) {
+          const d = it.dayIndex || 1;
+          if (!dayGroups[d]) dayGroups[d] = [];
+          dayGroups[d].push(it);
+        }
+
+        const getCatIcon = (cat) => {
+          if (cat === 'LODGING') return '🏨';
+          if (cat === 'ACTIVITY') return '🎟️';
+          if (cat === 'FOOD') return '🍽️';
+          if (cat === 'TRANSPORT') return '🚗';
+          return '📍';
+        };
+
+        const dayKeys = Object.keys(dayGroups).sort((a, b) => Number(a) - Number(b));
+        if (dayKeys.length > 0) {
+          document.getElementById('itinerary-list').innerHTML = dayKeys.map(day => `
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 12px; font-weight: 800; color: #1e293b; background: rgba(161, 196, 253, 0.3); padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <span>🗓️ Day ${day}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${dayGroups[day].map(it => `
+                  <div class="itinerary-item">
+                    <div>
+                      <div style="font-weight: 800; font-size: 14px; color: #1e293b; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <span>${getCatIcon(it.category)}</span>
+                        <span>${it.title}</span>
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-muted);">${it.description || it.merchantName}</div>
+                    </div>
+                    <div style="text-align: right; min-width: 90px;">
+                      <div style="font-weight: 800; font-size: 15px;">$${(it.priceCents/100).toFixed(2)}</div>
+                      ${it.status === 'PROPOSED' ? `<button class="btn btn-warning" style="padding: 4px 10px; font-size: 11px; margin-top: 6px;" onclick="bookItem('${it.id}')">Book now</button>` : `<span style="font-size: 11px; color: #059669; font-weight: 700;">${it.status}</span>`}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
             </div>
-            <div style="text-align: right;">
-              <div style="font-weight: 800; font-size: 16px;">$${(it.priceCents/100).toFixed(2)}</div>
-              ${it.status === 'PROPOSED' ? `<button class="btn btn-warning" style="padding: 4px 10px; font-size: 11px; margin-top: 6px;" onclick="bookItem('${it.id}')">Book now</button>` : `<span style="font-size: 11px; color: #059669; font-weight: 700;">${it.status}</span>`}
-            </div>
-          </div>
-        `).join('');
+          `).join('');
+        } else {
+          document.getElementById('itinerary-list').innerHTML = '<div style="font-size: 13px; color: var(--text-muted);">No items planned yet.</div>';
+        }
 
       } catch (err) { console.warn(err); }
     }

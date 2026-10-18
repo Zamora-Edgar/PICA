@@ -23,6 +23,7 @@ export function matchesDestination(optionDest: DestinationCity, targetDest?: str
   if (!targetDest) return true;
   const t = targetDest.toLowerCase().trim();
   const o = optionDest.toLowerCase().trim();
+  if ((t.includes("japan") || t.includes("tokyo")) && (o.includes("tokyo") || o.includes("japan"))) return true;
   return o === t || o.includes(t) || t.includes(o);
 }
 
@@ -65,6 +66,19 @@ export const CATALOG: CatalogOption[] = [
   { id: "food_fl_cuban", destination: "Florida", category: "FOOD", title: "Little Havana Calle Ocho Culinary Walk", merchantName: "Little Havana Food Tours", priceCents: 10_500, description: "Cuban sandwiches, croquetas, mojitos & Cuban coffee tasting", tags: ["food", "casual", "cuban"] },
   { id: "food_fl_stonecrab", destination: "Florida", category: "FOOD", title: "Joes Stone Crab Waterfront Dinner", merchantName: "Joes Stone Crab", priceCents: 33_000, description: "World-famous Florida stone crab claws & Key Lime pie", tags: ["food", "seafood", "luxury", "dinner"] },
   { id: "trn_fl_airport", destination: "Florida", category: "TRANSPORT", title: "MIA Airport Private Sprinter Shuttle", merchantName: "Miami Shuttle Express", priceCents: 7_500, description: "Private luxury van from Miami International to hotel", tags: ["transport"] },
+  // ─── TOKYO & JAPAN ────────────────────────────────────────────────────────
+  { id: "htl_tyo_shibuya", destination: "Tokyo", category: "LODGING", title: "Shibuya Sky Boutique Penthouse Suite (4 nights · 5 days)", merchantName: "Shibuya Sky Stays", priceCents: 45_000, description: "Modern panoramic high-rise suite in the heart of Shibuya Crossing", tags: ["luxury", "views", "central", "nightlife"] },
+  { id: "htl_tyo_shinjuku", destination: "Tokyo", category: "LODGING", title: "Shinjuku Park View High-Rise Suite (4 nights · 5 days)", merchantName: "Shinjuku Plaza Suites", priceCents: 39_000, description: "Sleek designer residence steps from Shinjuku Gyoen and nightlife", tags: ["apartment", "central", "views"] },
+  { id: "htl_tyo_asahi", destination: "Tokyo", category: "LODGING", title: "Asakusa Traditional Ryokan Suite (4 nights · 5 days)", merchantName: "Asakusa Ryokan", priceCents: 30_000, description: "Authentic Japanese style tatami suite with private wooden onsen bath", tags: ["budget", "culture", "peaceful"] },
+  { id: "act_tyo_teamlab", destination: "Tokyo", category: "ACTIVITY", title: "teamLab Planets Immersive Digital Art Passes", merchantName: "teamLab Tokyo", priceCents: 7_500, description: "World-renowned body-immersive digital artwork exhibitions and water rooms", tags: ["art", "photography", "views"] },
+  { id: "act_tyo_sensoji", destination: "Tokyo", category: "ACTIVITY", title: "Asakusa Senso-ji Temple & Kimono Street Walk", merchantName: "Tokyo Heritage Walks", priceCents: 4_500, description: "Historic Buddhist temple grounds, Nakamise shopping street & kimono experience", tags: ["culture", "history", "sightseeing"] },
+  { id: "act_tyo_shibuya_sky", destination: "Tokyo", category: "ACTIVITY", title: "Shibuya Sky 360 Observation Deck Sunset Passes", merchantName: "Shibuya Sky", priceCents: 6_000, description: "Open-air rooftop observatory with iconic vistas of Tokyo and Mount Fuji", tags: ["views", "sunset", "photography"] },
+  { id: "act_tyo_fuji", destination: "Tokyo", category: "ACTIVITY", title: "Mount Fuji & Lake Ashi Bullet Train Excursion", merchantName: "Fuji Scenic Tours", priceCents: 9_900, description: "Day trip to Mount Fuji 5th Station, volcanic valley & pirate boat cruise", tags: ["nature", "views", "adventure"] },
+  { id: "act_tyo_akiba", destination: "Tokyo", category: "ACTIVITY", title: "Akihabara VR & Retro Arcade Experience", merchantName: "Akiba Gaming Lounge", priceCents: 4_500, description: "Multiplayer VR games, classic arcade cabinets and anime district tour", tags: ["entertainment", "tech", "social"] },
+  { id: "food_tyo_tsukiji", destination: "Tokyo", category: "FOOD", title: "Tsukiji Outer Market Fresh Sushi & Wagyu Crawl", merchantName: "Tsukiji Fish Market", priceCents: 6_000, description: "Chef-guided morning food tour: fresh otoro tuna, tamagoyaki & A5 Wagyu", tags: ["food", "market", "seafood"] },
+  { id: "food_tyo_ramen", destination: "Tokyo", category: "FOOD", title: "Shinjuku Omoide Yokocho Ramen & Yakitori Crawl", merchantName: "Tokyo Alleyway Eats", priceCents: 4_500, description: "Atmospheric lantern-lit alleyway dinner tasting artisanal ramen and skewers", tags: ["food", "dinner", "casual"] },
+  { id: "food_tyo_izakaya", destination: "Tokyo", category: "FOOD", title: "Shibuya Golden Gai Evening Izakaya & Sake Tasting", merchantName: "Shibuya Izakaya Co", priceCents: 7_500, description: "Traditional multi-course izakaya dinner with premium sake pairings", tags: ["food", "drinks", "social"] },
+  { id: "trn_tyo_narita", destination: "Tokyo", category: "TRANSPORT", title: "Narita Express Private Sprinter Airport Shuttle", merchantName: "Tokyo Airport Shuttle", priceCents: 6_000, description: "Private luxury Sprinter van between Narita Airport and accommodation", tags: ["transport"] },
 ];
 
 // Compatibility alias for legacy IDs

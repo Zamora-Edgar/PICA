@@ -11,7 +11,7 @@ import { buildWallet } from "../commerce/wallet";
 import { prisma } from "../db";
 import { formatUsd, ITEM_CATEGORIES, parseJsonArray } from "../domain/types";
 import { getMerchantOffers } from "../integrations/visa";
-import { CATALOG, getAllCatalogOptions, getCatalogOption, matchesDestination, registerDynamicOptions, searchCatalog } from "./catalog";
+import { CATALOG, getAllCatalogOptions, getCatalogOption, matchesDestination, registerDynamicOptions, searchCatalog, type CatalogOption } from "./catalog";
 import { discoverGlobalDestination } from "../integrations/locationiq";
 import { recommendForTrip } from "./recommender";
 import { computeCostBreakdown, loadTripSnapshot } from "./tripContext";
@@ -111,6 +111,137 @@ const schemas = {
   cancel_booking: z.object({ itemId: z.string() }),
   request_purchase: z.object({ itemIds: z.array(z.string()).min(1) }),
 };
+function buildFiveDayPlan(city: string, options: CatalogOption[]): Array<{ dayIndex: number; option: CatalogOption }> {
+  const lodgings = options.filter(o => o.category === "LODGING");
+  const activities = options.filter(o => o.category === "ACTIVITY");
+  const foods = options.filter(o => o.category === "FOOD");
+
+  const hotel: CatalogOption = lodgings[0] || {
+    id: `dyn_htl_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "LODGING",
+    title: `${city} Central Skyline Suite (4 nights · 5 days)`,
+    merchantName: `${city} Grand Hotel`,
+    priceCents: 45_000,
+    description: `Centrally-located boutique suite close to transit, shopping & sights in ${city}`,
+    tags: ["hotel", "central", city.toLowerCase()],
+  };
+
+  const plan: Array<{ dayIndex: number; option: CatalogOption }> = [];
+
+  // Day 1: Hotel + Welcome Dinner
+  plan.push({ dayIndex: 1, option: hotel });
+  const day1Dinner = foods[0] || {
+    id: `dyn_food_1_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "FOOD",
+    title: `${city} Welcome Dinner & Tasting Feast`,
+    merchantName: `${city} Heritage Grill`,
+    priceCents: 6_000,
+    description: `Opening night group dinner featuring fresh local specialties in ${city}`,
+    tags: ["food", "dinner", city.toLowerCase()],
+  };
+  plan.push({ dayIndex: 1, option: day1Dinner });
+
+  // Day 2: Morning Landmark + Afternoon Activity
+  const day2Act1 = activities[0] || {
+    id: `dyn_act_1_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "ACTIVITY",
+    title: `${city} Iconic Heritage & Landmark Walking Tour`,
+    merchantName: `${city} Historic Walks`,
+    priceCents: 4_500,
+    description: `Guided morning walking tour of iconic historic sights and architecture in ${city}`,
+    tags: ["sightseeing", "history", city.toLowerCase()],
+  };
+  const day2Act2 = activities[1] || {
+    id: `dyn_act_2_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "ACTIVITY",
+    title: `${city} 360 Observation Deck Sunset Passes`,
+    merchantName: `${city} Skyline Observatory`,
+    priceCents: 6_000,
+    description: `Sunset passes with breathtaking panoramic views over ${city}`,
+    tags: ["views", "sunset", city.toLowerCase()],
+  };
+  plan.push({ dayIndex: 2, option: day2Act1 });
+  plan.push({ dayIndex: 2, option: day2Act2 });
+
+  // Day 3: Cultural Discovery + Lunch/Market
+  const day3Act = activities[2] || {
+    id: `dyn_act_3_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "ACTIVITY",
+    title: `${city} Premier Museum of Art & Cultural Treasures`,
+    merchantName: `${city} Art & Culture Foundation`,
+    priceCents: 5_400,
+    description: `VIP admission to world-class art exhibits and immersive installations in ${city}`,
+    tags: ["art", "culture", city.toLowerCase()],
+  };
+  const day3Food = foods[1] || {
+    id: `dyn_food_2_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "FOOD",
+    title: `${city} Artisan Market & Street Food Crawl`,
+    merchantName: `${city} Central Market`,
+    priceCents: 4_800,
+    description: `Lunch tasting crawl sampling regional pastries, savory dishes, and bites in ${city}`,
+    tags: ["food", "market", city.toLowerCase()],
+  };
+  plan.push({ dayIndex: 3, option: day3Act });
+  plan.push({ dayIndex: 3, option: day3Food });
+
+  // Day 4: Scenic Excursion / Tour + Evening Dining
+  const day4Act = activities[3] || {
+    id: `dyn_act_4_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "ACTIVITY",
+    title: `${city} Scenic River Cruise & Waterfront Promenade`,
+    merchantName: `${city} Harbor Cruises`,
+    priceCents: 7_500,
+    description: `Scenic afternoon cruise past iconic landmarks with audio guide in ${city}`,
+    tags: ["cruise", "scenic", "relaxing", city.toLowerCase()],
+  };
+  const day4Food = foods[2] || {
+    id: `dyn_food_3_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "FOOD",
+    title: `${city} Signature Rooftop Dining & Skyline Views`,
+    merchantName: `${city} Rooftop Bistro`,
+    priceCents: 7_500,
+    description: `Memorable group dinner overlooking the glittering skyline of ${city}`,
+    tags: ["food", "dinner", "views", city.toLowerCase()],
+  };
+  plan.push({ dayIndex: 4, option: day4Act });
+  plan.push({ dayIndex: 4, option: day4Food });
+
+  // Day 5: Farewell Landmark + Celebration Brunch
+  const day5Act = activities[4] || {
+    id: `dyn_act_5_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "ACTIVITY",
+    title: `${city} Royal Botanical Gardens & Nature Walk`,
+    merchantName: `${city} Parks & Gardens`,
+    priceCents: 3_600,
+    description: `Peaceful morning stroll through historic lush gardens and pavilions in ${city}`,
+    tags: ["nature", "walk", "peaceful", city.toLowerCase()],
+  };
+  const day5Food = foods[3] || {
+    id: `dyn_food_4_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+    destination: city,
+    category: "FOOD",
+    title: `${city} Farewell Celebration Brunch`,
+    merchantName: `${city} Grand Cafe`,
+    priceCents: 4_500,
+    description: `Relaxed celebration brunch to toast an unforgettable trip to ${city}`,
+    tags: ["food", "brunch", city.toLowerCase()],
+  };
+  plan.push({ dayIndex: 5, option: day5Act });
+  plan.push({ dayIndex: 5, option: day5Food });
+
+  return plan;
+}
+
 type ToolName = keyof typeof schemas;
 
 export async function executeTool(name: string, rawArgs: unknown, ctx: ToolContext): Promise<ToolResult> {
@@ -141,54 +272,61 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
 
       const tripName = args.tripName || fullName;
 
-      // Update trip destination and title
+      // 5-day trip date range (2 weeks out, spanning 5 days)
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() + 14);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 4);
+
+      // Update trip destination, title, and 5-day dates
       await prisma.trip.update({
         where: { id: ctx.tripId },
-        data: { destination: city, name: tripName },
-      });
-
-      // Clear proposed items from previous destination so itinerary matches the new city
-      await prisma.itineraryItem.deleteMany({
-        where: { tripId: ctx.tripId, status: "PROPOSED" },
-      });
-
-      // Auto-seed starter hotel for the new destination
-      const availableOptions = customOptions.length > 0 ? customOptions : getAllCatalogOptions().filter((o) => matchesDestination(o.destination, city));
-      let starterHotel = availableOptions.find((o) => o.category === "LODGING") || availableOptions[0];
-
-      if (!starterHotel) {
-        starterHotel = {
-          id: `dyn_htl_${city.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
-          destination: city,
-          category: "LODGING",
-          title: `${city} City Center Suite (2 nights)`,
-          merchantName: `${city} Grand Hotel`,
-          priceCents: 60_000,
-          description: `Prime central suite located in downtown ${city}`,
-          tags: ["hotel", "central", city.toLowerCase()],
-        };
-        registerDynamicOptions([starterHotel]);
-      }
-
-      await prisma.itineraryItem.create({
         data: {
-          tripId: ctx.tripId,
-          dayIndex: 1,
-          category: starterHotel.category,
-          title: starterHotel.title,
-          description: starterHotel.description,
-          catalogOptionId: starterHotel.id,
-          merchantName: starterHotel.merchantName,
-          priceCents: starterHotel.priceCents,
+          destination: city,
+          name: tripName,
+          startDate,
+          endDate,
         },
       });
+
+      // Clear all items from previous destination so itinerary matches the new city
+      await prisma.itineraryItem.deleteMany({
+        where: { tripId: ctx.tripId },
+      });
+
+      // Build complete 5-day itinerary (lodging + daily activities + dining)
+      const availableOptions = customOptions.length > 0 ? customOptions : getAllCatalogOptions().filter((o) => matchesDestination(o.destination, city));
+      const fiveDayPlan = buildFiveDayPlan(city, availableOptions);
+
+      // Register any generated options so they are valid catalog options
+      registerDynamicOptions(fiveDayPlan.map(p => p.option));
+
+      // Create all items across Days 1 through 5 in database
+      for (const item of fiveDayPlan) {
+        await prisma.itineraryItem.create({
+          data: {
+            tripId: ctx.tripId,
+            dayIndex: item.dayIndex,
+            category: item.option.category,
+            title: item.option.title,
+            description: item.option.description,
+            catalogOptionId: item.option.id,
+            merchantName: item.option.merchantName,
+            priceCents: item.option.priceCents,
+          },
+        });
+      }
+
+      const hotelItem = fiveDayPlan.find(p => p.option.category === "LODGING")?.option;
 
       return {
         data: {
           destination: city,
           tripName,
-          starterHotel: starterHotel?.title,
-          message: `Destination switched to ${city}! Cleared previous items and selected ${starterHotel?.title || "new lodging"}.`,
+          hotel: hotelItem?.title,
+          daysPlanned: 5,
+          totalItems: fiveDayPlan.length,
+          message: `Created a full 5-day itinerary for ${city} with hotel, daily activities, and dining across Days 1 to 5!`,
         },
         itineraryChanged: true,
       };
