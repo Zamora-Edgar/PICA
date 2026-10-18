@@ -7,22 +7,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Underline:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070a12;
-      --card-bg: rgba(15, 23, 42, 0.7);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-hover: rgba(59, 130, 246, 0.2);
-      --primary: #3b82f6;
-      --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-      --accent: #10b981;
-      --accent-glow: rgba(16, 185, 129, 0.25);
-      --visa-gold: #f59e0b;
-      --visa-glow: rgba(245, 158, 11, 0.2);
-      --purple: #8b5cf6;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --danger: #ef4444;
+      /* Neutral & Pastel Variables */
+      --bg: #faf9f8;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(0, 0, 0, 0.06);
+      --card-hover: rgba(161, 196, 253, 0.15);
+      --primary: #93a5cf;
+      --primary-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      --text: #334155;
+      --text-muted: #64748b;
       --radius: 16px;
     }
 
@@ -30,9 +26,9 @@
     body {
       background: var(--bg);
       background-image: 
-        radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12) 0px, transparent 45%),
-        radial-gradient(circle at 90% 20%, rgba(139, 92, 246, 0.10) 0px, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+        radial-gradient(circle at 10% 10%, rgba(161, 196, 253, 0.35) 0px, transparent 45%),
+        radial-gradient(circle at 90% 20%, rgba(251, 194, 235, 0.25) 0px, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(168, 237, 234, 0.35) 0px, transparent 50%);
       background-attachment: fixed;
       color: var(--text);
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -58,971 +54,355 @@
       padding-bottom: 20px;
       border-bottom: 1px solid var(--card-border);
     }
-    .logo-group {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+    
     .logo-badge {
-      background: var(--primary-gradient);
-      color: white;
+      font-family: "Montserrat Underline", sans-serif;
+      font-optical-sizing: auto;
       font-weight: 900;
+      font-style: normal;
+      background: var(--primary-gradient);
+      color: #1e293b;
       font-size: 24px;
-      letter-spacing: -0.5px;
       padding: 10px 18px;
       border-radius: 14px;
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      box-shadow: 0 4px 20px rgba(161, 196, 253, 0.4);
+      display: flex; align-items: center; gap: 8px;
     }
-    .logo-title h1 {
-      font-size: 22px;
+    
+    .logo-title h1 { 
+      font-family: "Montserrat Underline", sans-serif;
+      font-optical-sizing: auto;
       font-weight: 800;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-style: normal;
+      font-size: 24px; 
+      color: #1e293b; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
     }
-    .logo-title p {
-      color: var(--text-muted);
-      font-size: 13px;
-      margin-top: 2px;
-    }
+    .logo-title p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
 
-    .header-badges {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .header-badges { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
-      padding: 7px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.2px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #059669; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
     }
     .visa-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      color: #fbbf24;
-      padding: 7px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.2px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);
+      color: #d97706; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
     }
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background: #10b981;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #10b981;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    /* Action Control Bar */
-    .action-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      background: rgba(30, 41, 59, 0.4);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px 16px;
-      backdrop-filter: blur(10px);
-    }
-    .action-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-    .btn-primary {
-      background: var(--primary-gradient);
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    }
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
-    }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      border: 1px solid var(--card-border);
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-    .btn-warning {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-    .btn-warning:hover {
-      background: rgba(245, 158, 11, 0.25);
-    }
-
-    /* Metrics Strip */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-    .metric-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 18px 20px;
-      backdrop-filter: blur(14px);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .metric-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .metric-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.5px;
-    }
-    .metric-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+    .pulse-dot { width: 8px; height: 8px; background: #059669; border-radius: 50%; box-shadow: 0 0 8px #059669; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
 
     /* Hero Banner */
     .hero-banner {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.95));
-      border: 1px solid var(--card-border);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.95));
+      border: 1px solid var(--card-border); 
       border-radius: var(--radius);
-      padding: 22px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+      padding: 32px 36px;
+      min-height: 240px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-end; 
+      flex-wrap: wrap; 
       gap: 20px;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
     }
+    
     .hero-meta h2 {
-      font-size: 26px;
+      font-family: "Montserrat Underline", sans-serif;
+      font-optical-sizing: auto;
       font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-style: normal;
+      font-size: 32px; 
+      margin-bottom: 12px;
+      color: #0f172a; 
+      text-shadow: 0 2px 10px rgba(255,255,255,0.8);
     }
-    .hero-tags {
-      display: flex;
-      gap: 10px;
-      color: var(--text-muted);
-      font-size: 13px;
-      flex-wrap: wrap;
-    }
-    .hero-tag {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 4px 12px;
+
+    .hero-tags { display: flex; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+    .hero-tag { 
+      display: flex; align-items: center; gap: 6px; 
+      background: rgba(255, 255, 255, 0.85); 
+      border: 1px solid rgba(0, 0, 0, 0.1); 
+      padding: 6px 14px; 
       border-radius: 8px;
+      color: #0f172a; 
+      font-weight: 700;
+      backdrop-filter: blur(4px);
     }
 
     .photon-pill {
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.25);
-      padding: 12px 20px;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.85); 
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 22px; 
+      border-radius: 14px; 
+      display: flex; flex-direction: column; gap: 4px; 
+      cursor: pointer; transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
     }
-    .photon-pill:hover {
-      background: rgba(59, 130, 246, 0.18);
-      border-color: rgba(59, 130, 246, 0.4);
+    .photon-pill:hover { background: #ffffff; }
+    .photon-pill .label { font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+    .photon-pill .number { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 800; color: #0f172a; }
+
+    /* Action Control Bar */
+    .action-bar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      background: rgba(255, 255, 255, 0.6); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 16px; backdrop-filter: blur(10px);
     }
-    .photon-pill .label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #93c5fd;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s ease; font-family: inherit;
     }
-    .photon-pill .number {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 20px;
-      font-weight: 800;
-      color: #60a5fa;
+    .btn-primary { background: var(--primary-gradient); color: #1e293b; box-shadow: 0 4px 12px rgba(161, 196, 253, 0.4); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(161, 196, 253, 0.55); }
+    .btn-secondary { background: #ffffff; color: var(--text); border: 1px solid rgba(0, 0, 0, 0.1); }
+    .btn-secondary:hover { background: #f8fafc; }
+    .btn-warning { background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .btn-warning:hover { background: rgba(245, 158, 11, 0.15); }
+    .btn-danger { background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.15); }
+    .btn-success { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .btn-success:hover { background: rgba(16, 185, 129, 0.15); }
+    .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 8px; }
+
+    /* Metrics Strip */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .metric-card {
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px 20px;
+      backdrop-filter: blur(14px); display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     }
+    .metric-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .metric-val { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 800; color: var(--text); }
+    .metric-sub { font-size: 12px; color: var(--text-muted); }
 
     /* Main Grid */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 24px;
-    }
-    @media (max-width: 960px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
+    .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+    @media (max-width: 960px) { .main-grid { grid-template-columns: 1fr; } }
 
     /* Cards */
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 22px;
-      backdrop-filter: blur(16px);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 22px;
+      display: flex; flex-direction: column; gap: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .card-title { font-size: 16px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px; }
 
     /* Members Grid */
-    .members-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-    }
+    .members-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
     .member-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: all 0.2s ease;
+      background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 14px; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
     }
-    .member-item:hover {
-      border-color: rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .member-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .member-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .member-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
-      color: white;
-    }
-    .member-name {
-      font-weight: 700;
-      font-size: 15px;
-    }
-    .member-channel {
-      font-size: 11px;
-      background: rgba(59, 130, 246, 0.15);
-      color: #93c5fd;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    .member-phone {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-    .member-progress-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .progress-bar-bg {
-      height: 6px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.4s ease;
-    }
-    .member-costs {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-    .share-amount {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
-      font-weight: 800;
-      color: #34d399;
-    }
-    .budget-limit {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+    .member-avatar { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; background: #e2e8f0; }
+    .progress-bar-bg { height: 6px; width: 100%; background: rgba(0, 0, 0, 0.05); border-radius: 999px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
 
-    /* Itinerary List */
-    .itinerary-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .itinerary-item {
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 14px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      transition: all 0.2s ease;
-    }
-    .itinerary-item:hover {
-      background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(255, 255, 255, 0.12);
-    }
-    .item-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .item-title-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .item-title {
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .day-badge {
-      font-size: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-    }
-    .category-badge {
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-    }
-    .cat-LODGING { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
-    .cat-FOOD { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .cat-ACTIVITY { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .cat-TRANSPORT { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .item-desc {
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-    .item-cost-box {
-      text-align: right;
-      white-space: nowrap;
-    }
-    .item-total {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      font-size: 16px;
-      color: var(--text);
-    }
-    .item-split {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: #34d399;
-    }
-
-    /* Visa Card Box */
-    .visa-card {
-      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
-      position: relative;
-      overflow: hidden;
-    }
-    .visa-card::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.2), transparent);
-    }
-    .visa-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .visa-logo {
-      font-weight: 900;
-      font-size: 24px;
-      font-style: italic;
-      color: var(--visa-gold);
-      letter-spacing: -1px;
-    }
-    .visa-chip {
-      width: 34px;
-      height: 26px;
-      background: linear-gradient(135deg, #d97706, #fbbf24);
-      border-radius: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    .visa-token {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 15px;
-      letter-spacing: 2px;
-      color: rgba(255, 255, 255, 0.9);
-      font-weight: 600;
-    }
-    .visa-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.6);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Guardrail Rules */
-    .rule-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.02);
-      padding: 8px 12px;
-      border-radius: 8px;
-    }
-    .rule-icon { font-size: 16px; }
-
-    /* Message Timeline */
-    .message-timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 380px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .message-timeline::-webkit-scrollbar {
-      width: 4px;
-    }
-    .message-timeline::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-    }
+    /* Chat Elements */
+    .message-timeline { display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
     .msg-bubble {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      font-size: 13px;
-      transition: all 0.2s ease;
+      background: #ffffff; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 6px; font-size: 13px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
     }
-    .msg-bubble:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .msg-bubble.is-pica {
-      border-left: 3px solid #3b82f6;
-      background: rgba(59, 130, 246, 0.05);
-    }
-    .msg-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-    .msg-author {
-      font-weight: 700;
-      color: #93c5fd;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .msg-text {
-      line-height: 1.45;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+    .msg-bubble.is-pica { background: rgba(161, 196, 253, 0.15); border: none; border-bottom-left-radius: 4px; }
+    .msg-bubble:not(.is-pica) { border-bottom-right-radius: 4px; }
+    
+    .msg-header { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+    .chat-avatar { width: 20px; height: 20px; border-radius: 6px; object-fit: cover; }
+    .msg-author { font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 6px; }
+    
+    /* Typing Indicator */
+    .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .typing-dot { width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; animation: typing 1.4s infinite ease-in-out; }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
 
-    /* Web Interactive Simulator Box */
-    .interactive-box {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px;
-    }
-    .interactive-header {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .quick-chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .chip:hover {
-      background: rgba(59, 130, 246, 0.15);
-      color: #93c5fd;
-      border-color: rgba(59, 130, 246, 0.3);
-    }
-    .sim-input-row {
-      display: flex;
-      gap: 8px;
-    }
-    .sim-select {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      outline: none;
-      font-family: inherit;
-    }
-    .sim-input {
-      flex: 1;
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      font-size: 12px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      outline: none;
-      font-family: inherit;
-    }
-    .sim-input:focus {
-      border-color: #3b82f6;
-    }
+    /* Buttons & Interactive Elements */
+    .interactive-box { background: #f1f5f9; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .sim-input { flex: 1; background: #ffffff; border: 1px solid var(--card-border); padding: 8px 12px; border-radius: 8px; font-family: inherit; font-size: 12px; }
+    .sim-select { background: #ffffff; border: 1px solid var(--card-border); padding: 6px; border-radius: 8px; font-size: 12px; }
 
-    /* Shopping journey strip */
-    .journey {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 8px;
-    }
-    @media (max-width: 960px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .stage {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-    .stage.live { border-color: rgba(245, 158, 11, 0.45); box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.15) inset; }
-    .stage-name { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #fbbf24; }
-    .stage-val { font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
-
-    /* Recommendations */
+    /* Lists & Picks */
     .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-    .rec {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .rec-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
-    .rec-score {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      font-size: 12px;
-      color: #34d399;
-      background: rgba(16, 185, 129, 0.12);
-      border-radius: 8px;
-      padding: 2px 8px;
-      white-space: nowrap;
-    }
-    .why { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); }
-    .why li::before { content: '→ '; color: #60a5fa; }
-    .offer-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      color: #fbbf24;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 2px 7px;
-      border-radius: 4px;
-    }
-    .status-badge { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
-    .st-PROPOSED { background: rgba(255,255,255,0.08); color: var(--text-muted); }
-    .st-PURCHASING, .st-FINALIZING { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
-    .st-PURCHASED { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 8px; }
-    .btn-danger { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .btn-danger:hover { background: rgba(239, 68, 68, 0.22); }
-    .btn-success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
-    .btn-success:hover { background: rgba(16, 185, 129, 0.25); }
-
-    /* Wallet & trust center */
+    .rec { background: #ffffff; border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .rec-score { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 11px; color: #059669; background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; display: inline-block; width: fit-content; }
+    
+    .itinerary-item { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+    
+    /* Wallet Elements */
     .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tab {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      font: inherit;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 8px;
-      cursor: pointer;
+    .tab { background: #ffffff; border: 1px solid var(--card-border); color: var(--text-muted); font: inherit; font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+    .tab.active { background: rgba(245, 158, 11, 0.1); color: #d97706; border-color: rgba(245, 158, 11, 0.3); }
+    .visa-card {
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;
     }
-    .tab.active { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
     .visa-card.revoked { filter: grayscale(1); opacity: 0.6; }
+    .visa-header { display: flex; justify-content: space-between; align-items: center; }
+    .visa-logo { font-weight: 900; font-size: 24px; font-style: italic; color: #1e293b; letter-spacing: -1px; }
+    .visa-chip { width: 34px; height: 26px; background: linear-gradient(135deg, #fcd34d, #fde68a); border-radius: 5px; border: 1px solid rgba(255, 255, 255, 0.8); }
+    .visa-token { font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 2px; color: #1e293b; font-weight: 700; }
+    .visa-footer { display: flex; justify-content: space-between; font-size: 11px; color: #334155; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
     .kv { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
     .kv span:first-child { color: var(--text-muted); }
-    .kv span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 700; text-align: right; }
+    .kv span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #1e293b; text-align: right; }
     .section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
-    .approval {
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      border-radius: 10px;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 13px;
-    }
-    .audit-list { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
-    .audit {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 12px;
-    }
-    .audit summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; list-style: none; }
-    .audit summary::-webkit-details-marker { display: none; }
-    .audit-checks { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
-    .check { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
-    .check.pass { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
-    .check.fail { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
-    .muted { color: var(--text-muted); }
-    .tier-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
-    .tier-bar div { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .rule-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); background: rgba(0, 0, 0, 0.02); padding: 8px 12px; border-radius: 8px; }
+    .tier-bar { height: 6px; background: rgba(0,0,0,0.05); border-radius: 999px; overflow: hidden; }
+    .tier-bar div { height: 100%; background: linear-gradient(90deg, #fcd34d, #f59e0b); }
+    .approval { background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
 
-    /* Toast Notification */
     #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #1e293b;
-      border: 1px solid #3b82f6;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 13px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.3s ease;
-      pointer-events: none;
-      z-index: 1000;
+      position: fixed; bottom: 24px; right: 24px; background: #ffffff; border: 1px solid #bfdbfe;
+      color: #1e293b; padding: 12px 20px; border-radius: 10px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
     }
-    #toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    #toast.show { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
     <header>
       <div class="logo-group">
-        <div class="logo-badge">🌴 PICA</div>
+        <div class="logo-badge">PICA</div>
         <div class="logo-title">
           <h1>Personal Itinerary Commerce Agent</h1>
           <p>Autonomous Group Travel · Powered by Photon 2.0 & Visa Intelligent Commerce</p>
         </div>
       </div>
       <div class="header-badges">
-        <div class="status-pill">
-          <div class="pulse-dot"></div>
-          <span>Photon 2.0 Multi-Channel Live</span>
-        </div>
-        <div class="visa-pill">
-          <span>💳 Visa Intelligent Commerce</span>
-        </div>
+        <div class="status-pill"><div class="pulse-dot"></div><span>Photon 2.0 Multi-Channel Live</span></div>
+        <div class="visa-pill"><span>Visa Intelligent Commerce</span></div>
       </div>
     </header>
 
-    <!-- Top Action Control Bar -->
-    <div class="action-bar">
-      <div class="action-group">
-        <button class="btn btn-primary" onclick="triggerAdjustBudget()">⚡ Auto-Optimize Budget</button>
-        <button class="btn btn-secondary" onclick="triggerRemindAll()">🔔 Remind Group</button>
-        <button class="btn btn-secondary" onclick="copyInviteLink()">📋 Copy Share Link</button>
-      </div>
-      <div style="font-size: 12px; color: var(--text-muted);" id="refresh-status">
-        Auto-syncing every 2.5s
-      </div>
-    </div>
-
-    <!-- Visa shopping journey: every stage, live -->
-    <div class="journey" id="journey"></div>
-
-    <!-- Live Metrics Strip -->
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-label">💵 Total Itinerary</div>
-        <div class="metric-val" id="stat-total-cost">$0</div>
-        <div class="metric-sub" id="stat-item-count">0 items proposed</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">👥 Per-Person Average</div>
-        <div class="metric-val" id="stat-avg-cost">$0</div>
-        <div class="metric-sub" id="stat-split-count">Split equally among 3 travelers</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">🛡️ Budget Health</div>
-        <div class="metric-val" style="color: #34d399;" id="stat-budget-health">100% Fit</div>
-        <div class="metric-sub" id="stat-budget-cap">Lowest Member Cap: $300</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">🎁 Visa Rewards Earned</div>
-        <div class="metric-val" style="color: #fbbf24;" id="stat-rewards">0 pts</div>
-        <div class="metric-sub" id="stat-cashback">$0.00 Visa offer cash back</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">✈️ Trip Countdown</div>
-        <div class="metric-val" style="color: #60a5fa;" id="stat-countdown">7 Days</div>
-        <div class="metric-sub">Oct 24, 2026 · San Diego, CA</div>
-      </div>
-    </div>
-
-    <!-- Hero Banner -->
     <div class="hero-banner">
       <div class="hero-meta">
         <h2 id="trip-name">San Diego Weekend Getaway</h2>
         <div class="hero-tags">
-          <div class="hero-tag">📍 <span id="trip-dest">San Diego, CA</span></div>
-          <div class="hero-tag">📅 <span id="trip-dates">Oct 24 – Oct 25, 2026</span></div>
-          <div class="hero-tag">👥 <span id="member-count">3 Members</span></div>
-          <div class="hero-tag">☀️ 74°F Sunny & Breezy</div>
+          <div class="hero-tag"><span id="trip-dest">San Diego, CA</span></div>
+          <div class="hero-tag"><span id="trip-dates">Oct 24 – Oct 25, 2026</span></div>
+          <div class="hero-tag"><span id="member-count">3 Members</span></div>
+          <div class="hero-tag">74°F Sunny & Breezy</div>
         </div>
       </div>
-      <div class="photon-pill" onclick="copyPhotonNumber()" title="Click to copy number">
-        <div class="label">💬 Text PICA on iMessage / SMS</div>
+      <div class="photon-pill" onclick="copyPhotonNumber()">
+        <div class="label">Text PICA on iMessage / SMS</div>
         <div class="number">+1 (628) 316-6196</div>
       </div>
     </div>
 
-    <!-- Main Grid -->
+    <div class="action-bar">
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" onclick="triggerAdjustBudget()">Auto-Optimize Budget</button>
+        <button class="btn btn-secondary" onclick="triggerRemindAll()">Remind Group</button>
+      </div>
+      <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Auto-syncing every 2.5s</div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Trip Total</div>
+        <div class="metric-val" id="stat-total-cost">$0</div>
+        <div class="metric-sub" id="stat-item-count">PICA is brainstorming ideas...</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Cost per person</div>
+        <div class="metric-val" id="stat-avg-cost">$0</div>
+        <div class="metric-sub">Split equally among the group</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Budget check</div>
+        <div class="metric-val" style="color: #059669;" id="stat-budget-health">Looking good!</div>
+        <div class="metric-sub" id="stat-budget-cap">Everyone is under budget</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Visa Rewards</div>
+        <div class="metric-val" style="color: #d97706;" id="stat-rewards">0 pts</div>
+        <div class="metric-sub" id="stat-cashback">$0.00 cash back on offers</div>
+      </div>
+    </div>
+
     <div class="main-grid">
-      <!-- Left Column: Members & Itinerary -->
+      <!-- Left Column: Planning Data -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
-        <!-- Members Card -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">👥 Group Members & Fair Share Split</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Real-time budget utilization</div>
+          <div style="display: flex; justify-content: space-between;">
+            <div class="card-title">Group Members</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Real-time tracking</div>
           </div>
-          <div class="members-grid" id="members-list">
-            <!-- Dynamic members injected here -->
-          </div>
+          <div class="members-grid" id="members-list"></div>
         </div>
 
-        <!-- AI Picks: discovery, personalization, decision support -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">✨ AI Picks for Your Group</div>
+          <div style="display: flex; justify-content: space-between;">
+            <div class="card-title">Handpicked for you by PICA</div>
             <select class="sim-select" id="rec-category" onchange="loadRecommendations()">
               <option value="">All categories</option>
               <option value="ACTIVITY">Activities</option>
               <option value="FOOD">Food</option>
-              <option value="LODGING">Lodging</option>
-              <option value="TRANSPORT">Transport</option>
             </select>
           </div>
-          <div class="muted" style="font-size: 12px;">Ranked on each member's likes, dislikes and remaining budget, plus Visa offers. Every pick shows why.</div>
+          <div style="font-size: 13px; color: var(--text-muted);">PICA ranks these based on what everyone likes and what everyone can afford.</div>
           <div class="rec-grid" id="rec-list"></div>
         </div>
 
-        <!-- Itinerary Card -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">🗺️ Group Itinerary & Cost Breakdown</div>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 800; color: #34d399;" id="total-trip-cost">$0.00</div>
-          </div>
-          <div class="itinerary-list" id="itinerary-list">
-            <!-- Dynamic items injected here -->
-          </div>
+          <div class="card-title">Group Itinerary</div>
+          <div class="itinerary-list" id="itinerary-list"></div>
         </div>
       </div>
 
-      <!-- Right Column: Visa Guardrails & Live Feed -->
+      <!-- Right Column: Conversational Agent & Trust -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
-        <!-- Visa Wallet & Trust Center -->
+        
+        <!-- Live Chat -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">💳 Visa Wallet & Trust Center</div>
-          </div>
-          <div class="tabs" id="wallet-tabs"></div>
-          <div id="wallet-body" style="display: flex; flex-direction: column; gap: 12px;">
-            <div class="muted" style="font-size: 13px;">Loading wallet...</div>
-          </div>
-        </div>
-
-        <!-- Audit trail: every trust-layer decision with its consent evidence -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">🛡️ Payment Audit Trail</div>
-            <div class="muted" style="font-size: 11px;">Tap a row for every rule check</div>
-          </div>
-          <div class="audit-list" id="audit-list">
-            <div class="muted" style="font-size: 13px;">No payment decisions yet. Book an item to see the trust layer at work.</div>
-          </div>
-        </div>
-
-        <!-- Live Cross-Channel Feed & Web Console -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📡 Live Multi-Channel Thread</div>
-            <div style="font-size: 11px; color: #34d399;">● LIVE</div>
+          <div style="display: flex; justify-content: space-between;">
+            <div class="card-title">Live Agent Thread</div>
+            <div style="font-size: 11px; font-weight: 800; color: #059669;">● LIVE</div>
           </div>
           
           <div class="message-timeline" id="message-feed">
-            <div style="color: var(--text-muted); font-size: 13px;">Listening for messages via Photon 2.0...</div>
+            <div style="color: var(--text-muted); font-size: 13px; text-align: center; margin-top: 20px;">
+              Listening for messages via Photon 2.0...
+            </div>
           </div>
 
-          <!-- Interactive Test Console -->
+          <!-- Web Console -->
           <div class="interactive-box">
-            <div class="interactive-header">
-              <span>Interactive PICA Console</span>
-              <span>Test Commands</span>
-            </div>
-            <div class="quick-chips">
-              <span class="chip" onclick="quickSend('Summary')">Summary</span>
-              <span class="chip" onclick="quickSend('Adjust to my budget')">Adjust to budget</span>
-              <span class="chip" onclick="quickSend('Remind everyone')">Remind group</span>
-              <span class="chip" onclick="quickSend('My budget is $300')">My budget is $300</span>
-              <span class="chip" onclick="quickSend('Suggest something')">Suggest something</span>
-              <span class="chip" onclick="quickSend('Rewards')">Rewards</span>
-            </div>
-            <div class="sim-input-row">
+            <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Interact with PICA</div>
+            <div style="display: flex; gap: 8px;">
               <select class="sim-select" id="sim-user">
                 <option value="edgar">Edgar</option>
                 <option value="omar">Omar</option>
                 <option value="jairo">Jairo</option>
               </select>
-              <input type="text" class="sim-input" id="sim-text" placeholder="Type a message or command..." onkeydown="if(event.key==='Enter') sendSimMessage()">
+              <input type="text" class="sim-input" id="sim-text" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendSimMessage()">
               <button class="btn btn-primary" style="padding: 6px 12px;" onclick="sendSimMessage()">Send</button>
             </div>
           </div>
         </div>
+
+        <!-- Visa Wallet -->
+        <div class="card">
+          <div class="card-title">Visa Wallet & Rules</div>
+          <div style="display: flex; gap: 6px;" id="wallet-tabs"></div>
+          <div id="wallet-body" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+
+        <!-- Audit Trail -->
+        <div class="card">
+          <div class="card-title">PICA's Decision Log</div>
+          <div style="font-size: 12px; color: var(--text-muted);">How PICA protected your wallet</div>
+          <div id="audit-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;">
+            <div style="font-size: 13px; color: var(--text-muted);">Nothing booked yet! Tell PICA to start looking for hotels to get the ball rolling.</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1031,58 +411,27 @@
 
   <script>
     let activeTripData = null;
+    let walletData = null;
+    let walletTab = null;
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function copyPhotonNumber() {
-      navigator.clipboard.writeText('+16283166196');
-      showToast('Copied Photon number +1 (628) 316-6196 to clipboard!');
-    }
-
-    function copyInviteLink() {
-      if (activeTripData && activeTripData.trip && activeTripData.trip.inviteUrl) {
-        navigator.clipboard.writeText(activeTripData.trip.inviteUrl);
-        showToast('Copied invite link: ' + activeTripData.trip.inviteUrl);
-      } else {
-        navigator.clipboard.writeText(window.location.origin);
-        showToast('Copied trip link to clipboard!');
-      }
-    }
-
-    async function triggerAdjustBudget() {
-      try {
-        showToast('⚡ Optimizing trip to lowest budget...');
-        const res = await fetch('/api/active/adjust-budget', { method: 'POST' });
-        if (res.ok) {
-          showToast('✅ Trip adjusted to fit budget! Broadcast sent to group.');
-          await loadDashboard();
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function triggerRemindAll() {
-      try {
-        showToast('🔔 Sending reminder alerts to group...');
-        const res = await fetch('/api/active/remind', { method: 'POST' });
-        if (res.ok) {
-          showToast('✅ Sent reminders to all members!');
-          await loadDashboard();
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function quickSend(txt) {
-      document.getElementById('sim-text').value = txt;
-      sendSimMessage();
+    function showTypingIndicator() {
+      const feed = document.getElementById('message-feed');
+      if (feed.innerHTML.includes('Listening for messages')) feed.innerHTML = '';
+      feed.innerHTML += `
+        <div class="msg-bubble is-pica" id="typing-indicator" style="width: fit-content; padding: 8px 14px;">
+          <div class="msg-header"><span class="msg-author">PICA Agent</span></div>
+          <div class="typing-indicator">
+            <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+          </div>
+        </div>`;
+      feed.scrollTop = feed.scrollHeight;
     }
 
     async function sendSimMessage() {
@@ -1093,30 +442,49 @@
 
       const userSel = document.getElementById('sim-user').value;
       let userId;
-      if (activeTripData && activeTripData.trip && activeTripData.trip.members) {
+      if (activeTripData?.trip?.members) {
         const found = activeTripData.trip.members.find(m => m.user.name.toLowerCase().includes(userSel));
         if (found) userId = found.userId;
       }
 
-      showToast(`Sending: "${text}"...`);
+      showTypingIndicator();
+      
       try {
         await fetch('/api/active/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text, userId })
         });
-        setTimeout(loadDashboard, 800);
+        setTimeout(loadDashboard, 1500); 
       } catch (err) {
         console.error(err);
       }
     }
 
-    const AVATAR_COLORS = [
-      'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-      'linear-gradient(135deg, #10b981, #059669)',
-      'linear-gradient(135deg, #f59e0b, #d97706)',
-      'linear-gradient(135deg, #8b5cf6, #6d28d9)'
-    ];
+    async function triggerAdjustBudget() { showToast('Optimizing trip...'); await fetch('/api/active/adjust-budget', { method: 'POST' }); loadDashboard(); }
+    async function triggerRemindAll() { showToast('Reminding group...'); await fetch('/api/active/remind', { method: 'POST' }); loadDashboard(); }
+    function copyPhotonNumber() { navigator.clipboard.writeText('+16283166196'); showToast('Copied number!'); }
+    const usd = cents => '$' + (cents / 100).toFixed(2);
+    function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+    async function loadDestinationImage(cityName) {
+      const UNSPLASH_KEY = '9vhnjg4vQ1g7JzU353xBoy6nksLNlAvDXHGQv_UJTfk'; 
+      
+      try {
+        const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(cityName)}&orientation=landscape&client_id=${UNSPLASH_KEY}`);
+        const data = await res.json();
+        
+        if (data.results && data.results.length > 0) {
+          const imageUrl = data.results[0].urls.regular;
+          const heroBanner = document.querySelector('.hero-banner');
+          heroBanner.style.backgroundImage = `linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(248, 250, 252, 0.2)), url('${imageUrl}')`;
+          heroBanner.style.backgroundSize = 'cover';
+          heroBanner.style.backgroundPosition = 'center';
+        }
+      } catch (err) {
+        console.error('Failed to load destination image', err);
+      }
+    }
 
     async function loadDashboard() {
       try {
@@ -1126,353 +494,203 @@
         activeTripData = data;
         const { trip, costs, messages } = data;
 
-        document.getElementById('trip-name').textContent = trip.name;
-        document.getElementById('trip-dest').textContent = trip.destination + ', CA';
-        document.getElementById('member-count').textContent = `${trip.members.length} Members`;
+        document.getElementById('stat-item-count').textContent = 'PICA is brainstorming ideas...';
+        
+        if (trip.name) document.getElementById('trip-name').textContent = trip.name;
+        if (trip.destination) {
+          document.getElementById('trip-dest').textContent = trip.destination + ', CA';
+          loadDestinationImage(trip.destination);
+        }
+        if (trip.members) document.getElementById('member-count').textContent = `${trip.members.length} Members`;
 
-        // Total cost calculation
         const activeItems = (trip.items || []).filter(it => it.status !== 'REMOVED');
-        const totalCents = activeItems.reduce((sum, item) => sum + (item.priceCents || 0), 0);
-        const totalUsd = (totalCents / 100).toFixed(2);
-        document.getElementById('total-trip-cost').textContent = `Total: $${totalUsd}`;
-        document.getElementById('stat-total-cost').textContent = `$${totalUsd}`;
-        document.getElementById('stat-item-count').textContent = `${activeItems.length} active itinerary items`;
+        const totalCents = activeItems.reduce((s, i) => s + (i.priceCents || 0), 0);
+        document.getElementById('stat-total-cost').textContent = '$' + (totalCents/100).toFixed(2);
+        if(activeItems.length > 0) document.getElementById('stat-item-count').textContent = `${activeItems.length} items on the plan`;
+        
+        const avgUsd = (totalCents / 100 / (trip.members?.length || 1)).toFixed(2);
+        document.getElementById('stat-avg-cost').textContent = '$' + avgUsd;
 
-        // Average cost
-        const memberCount = trip.members.length || 1;
-        const avgUsd = (totalCents / 100 / memberCount).toFixed(2);
-        document.getElementById('stat-avg-cost').textContent = `$${avgUsd}`;
-
-        // Budget Health
-        let maxUsage = 0;
-        let lowestBudget = 999999;
-        costs.forEach(c => {
-          const cap = c.budgetCents || 40000;
-          if (cap < lowestBudget) lowestBudget = cap;
-          const ratio = c.totalCents / cap;
+        let maxUsage = 0; let lowestBudget = 999999;
+        (costs || []).forEach(c => {
+          if (c.budgetCents < lowestBudget) lowestBudget = c.budgetCents;
+          const ratio = c.totalCents / (c.budgetCents || 1);
           if (ratio > maxUsage) maxUsage = ratio;
         });
+        
         const healthEl = document.getElementById('stat-budget-health');
         if (maxUsage <= 1.0) {
-          healthEl.textContent = '100% Fit';
-          healthEl.style.color = '#34d399';
+          healthEl.textContent = 'Looking good!';
+          healthEl.style.color = '#059669';
         } else {
-          healthEl.textContent = 'Over Cap';
-          healthEl.style.color = '#ef4444';
+          healthEl.textContent = 'Budget exceeded!';
+          healthEl.style.color = '#dc2626';
         }
-        document.getElementById('stat-budget-cap').textContent = `Lowest Member Cap: $${(lowestBudget / 100).toFixed(0)}`;
 
-        // Members Render
-        const membersList = document.getElementById('members-list');
-        membersList.innerHTML = trip.members.map((m, idx) => {
-          const costInfo = costs.find(c => c.userId === m.user.id) || { totalCents: 0, budgetCents: 40000 };
-          const shareUsd = (costInfo.totalCents / 100).toFixed(2);
-          const budgetUsd = (costInfo.budgetCents / 100).toFixed(0);
-          const ratio = Math.min(100, Math.round((costInfo.totalCents / (costInfo.budgetCents || 40000)) * 100));
-          const fillColor = ratio > 100 ? '#ef4444' : ratio > 85 ? '#f59e0b' : '#10b981';
-          const initials = m.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-          const avatarBg = AVATAR_COLORS[idx % AVATAR_COLORS.length];
-
-          return `
-            <div class="member-item">
-              <div class="member-top">
-                <div class="member-profile">
-                  <div class="member-avatar" style="background: ${avatarBg};">${initials}</div>
-                  <div>
-                    <div class="member-name">${m.user.name} ${m.role === 'ORGANIZER' ? '👑' : ''}</div>
-                    <div class="member-phone">${m.user.phoneE164}</div>
+        if (trip.members) {
+          document.getElementById('members-list').innerHTML = trip.members.map((m) => {
+            const c = costs.find(x => x.userId === m.user.id) || { totalCents: 0, budgetCents: 40000 };
+            const ratio = Math.min(100, Math.round((c.totalCents / c.budgetCents) * 100));
+            const color = ratio > 100 ? '#dc2626' : ratio > 85 ? '#d97706' : '#059669';
+            const left = ((c.budgetCents - c.totalCents) / 100).toFixed(0);
+            
+            return `
+              <div class="member-item">
+                <div style="display: flex; justify-content: space-between;">
+                  <div style="display: flex; gap: 10px; align-items: center;">
+                    <img class="member-avatar" src="https://i.pravatar.cc/150?u=${m.user.name.replace(/\s/g,'')}" alt="Avatar">
+                    <div>
+                      <div style="font-weight: 800; font-size: 15px; color: #1e293b;">${m.user.name} ${m.role === 'ORGANIZER' ? '<span style="font-size:11px; font-weight:600; color:var(--text-muted);">(Organizer)</span>' : ''}</div>
+                      <div style="font-size: 11px; background: rgba(161, 196, 253, 0.2); color: #2563eb; padding: 2px 6px; border-radius: 4px; display: inline-block;">${m.user.preferredChannel.toUpperCase()}</div>
+                    </div>
                   </div>
+                  <div style="text-align: right; font-size: 18px; font-weight: 800; color: #059669;">$${(c.totalCents/100).toFixed(2)}</div>
                 </div>
-                <span class="member-channel">${m.user.preferredChannel}</span>
-              </div>
-              <div class="member-progress-wrap">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
-                  <span>Budget Utilization</span>
-                  <span>${ratio}%</span>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between;">
+                    <span>How you're tracking</span>
+                    <span>${left > 0 ? `$${left} left` : 'Over budget'}</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${ratio}%; background: ${color};"></div></div>
                 </div>
-                <div class="progress-bar-bg">
-                  <div class="progress-bar-fill" style="width: ${ratio}%; background: ${fillColor};"></div>
-                </div>
-              </div>
-              <div class="member-costs">
-                <div>
-                  <div style="font-size: 11px; color: var(--text-muted);">Current Share</div>
-                  <div class="share-amount">$${shareUsd}</div>
-                </div>
-                <div style="text-align: right;">
-                  <div style="font-size: 11px; color: var(--text-muted);">Cap Limit</div>
-                  <div class="budget-limit">$${budgetUsd}</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
+              </div>`;
+          }).join('');
+        }
 
-        // Itinerary Render
-        const itList = document.getElementById('itinerary-list');
-        const offers = data.offers || [];
-        itList.innerHTML = activeItems.map(it => {
-          const itemTotalUsd = (it.priceCents / 100).toFixed(2);
-          const optOuts = JSON.parse(it.optOutUserIds || '[]').length;
-          const perPersonUsd = (it.priceCents / 100 / Math.max(1, memberCount - optOuts)).toFixed(2);
-          const offer = offers.find(o => o.merchantName.toLowerCase() === it.merchantName.toLowerCase());
-          const action = it.status === 'PROPOSED'
-            ? `<button class="btn btn-warning btn-sm" onclick="bookItem('${it.id}')">💳 Book with Visa</button>`
-            : it.status === 'PURCHASED'
-              ? `<button class="btn btn-danger btn-sm" onclick="cancelItem('${it.id}')">↩ Cancel & refund</button>`
-              : `<span class="muted" style="font-size: 11px;">Waiting on approvals</span>`;
-          return `
-            <div class="itinerary-item">
-              <div class="item-meta">
-                <div class="item-title-row">
-                  <span class="day-badge">Day ${it.dayIndex}</span>
-                  <span class="item-title">${esc(it.title)}</span>
-                  <span class="category-badge cat-${it.category}">${it.category}</span>
-                  <span class="status-badge st-${it.status}">${it.status === 'PURCHASED' ? 'Booked' : it.status.toLowerCase()}</span>
-                </div>
-                <div class="item-desc">${esc(it.description || it.merchantName)}</div>
-                ${offer ? `<div><span class="offer-badge">VISA OFFER · ${esc(offer.headline)}</span></div>` : ''}
-              </div>
-              <div class="item-cost-box" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-                <div class="item-total">$${itemTotalUsd}</div>
-                <div class="item-split">$${perPersonUsd}/person</div>
-                ${action}
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        // Message Feed Render
         const feed = document.getElementById('message-feed');
         if (messages && messages.length > 0) {
           feed.innerHTML = messages.map(msg => {
             const isPica = msg.direction === 'OUTBOUND';
-            const author = isPica ? '🌴 PICA Agent' : (msg.user?.name || 'Member');
+            const name = isPica ? 'PICA' : (msg.user?.name || 'Member');
+            const avatar = isPica 
+              ? '<div style="background:#93a5cf; color:white; width:20px; height:20px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold;">P</div>' 
+              : `<img src="https://i.pravatar.cc/150?u=${name.replace(/\s/g,'')}" class="chat-avatar">`;
+            
             return `
               <div class="msg-bubble ${isPica ? 'is-pica' : ''}">
                 <div class="msg-header">
-                  <span class="msg-author">${isPica ? '⚡ ' : '👤 '}${author}</span>
-                  <span>${(msg.channel || 'imessage').toUpperCase()}</span>
+                  <span class="msg-author">${avatar} ${name}</span>
                 </div>
-                <div class="msg-text">${esc(msg.body)}</div>
-              </div>
-            `;
+                <div class="msg-text">${String(msg.body).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))}</div>
+              </div>`;
           }).join('');
+          feed.scrollTop = feed.scrollHeight;
         }
-      } catch (err) {
-        console.warn('Dashboard fetch error:', err);
-      }
-    }
 
-    function esc(v) {
-      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    }
-    const usd = cents => '$' + (cents / 100).toFixed(2);
-
-    async function postJson(url, body) {
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
-      const json = await res.json().catch(() => ({}));
-      return { ok: res.ok, json };
-    }
-
-    // ── Discovery / personalization / decision-making ──
-    let recCount = 0;
-    async function loadRecommendations() {
-      const cat = document.getElementById('rec-category').value;
-      const res = await fetch('/api/active/recommendations' + (cat ? `?category=${cat}` : ''));
-      if (!res.ok) return;
-      const recs = await res.json();
-      recCount = recs.length;
-      const days = activeTripData && activeTripData.trip.items.length ? Math.max(...activeTripData.trip.items.map(i => i.dayIndex)) : 1;
-      document.getElementById('rec-list').innerHTML = recs.length ? recs.map(r => `
-        <div class="rec">
-          <div class="rec-top">
+        document.getElementById('itinerary-list').innerHTML = activeItems.map(it => `
+          <div class="itinerary-item">
             <div>
-              <div class="item-title">${esc(r.option.title)}</div>
-              <div class="muted" style="font-size: 12px;">${usd(r.perPersonCents)}/person · ${esc(r.option.merchantName)}</div>
+              <div style="font-weight: 800; font-size: 14px; color: #1e293b; margin-bottom: 4px;">${it.title}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">${it.description || it.merchantName}</div>
             </div>
-            <span class="rec-score" title="Match score">${r.score}% match</span>
+            <div style="text-align: right;">
+              <div style="font-weight: 800; font-size: 16px;">$${(it.priceCents/100).toFixed(2)}</div>
+              ${it.status === 'PROPOSED' ? `<button class="btn btn-warning" style="padding: 4px 10px; font-size: 11px; margin-top: 6px;" onclick="bookItem('${it.id}')">Book now</button>` : `<span style="font-size: 11px; color: #059669; font-weight: 700;">${it.status}</span>`}
+            </div>
           </div>
-          ${r.offer ? `<div><span class="offer-badge">VISA OFFER · ${esc(r.offer.headline)}</span></div>` : ''}
-          <ul class="why">${r.reasons.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
-          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-            <span class="muted" style="font-size: 11px;">Earns ~${r.pointsPerPerson} pts/person</span>
-            <span style="flex: 1;"></span>
-            ${Array.from({ length: days }, (_, i) => `<button class="btn btn-secondary btn-sm" onclick="addPick('${r.option.id}', ${i + 1})">+ Day ${i + 1}</button>`).join('')}
-          </div>
-        </div>`).join('') : '<div class="muted" style="font-size: 13px;">Everything we would recommend is already in the plan.</div>';
-      renderJourney();
+        `).join('');
+
+      } catch (err) { console.warn(err); }
     }
 
-    async function addPick(optionId, dayIndex) {
-      const { ok } = await postJson('/api/active/items', { optionId, dayIndex });
-      showToast(ok ? '✨ Added to the plan, group notified' : 'Could not add that pick');
-      await refreshAll();
+    async function loadRecommendations() {
+      try {
+        const res = await fetch('/api/active/recommendations');
+        if (!res.ok) return;
+        const recs = await res.json();
+        document.getElementById('rec-list').innerHTML = recs.length ? recs.map(r => `
+          <div class="rec">
+            <div>
+              <div style="font-weight: 800; font-size: 14px;">${r.option.title}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">$${(r.perPersonCents/100).toFixed(2)}/person · ${r.option.merchantName}</div>
+            </div>
+            <span class="rec-score">Top pick for the group</span>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">- ${r.reasons[0] || 'Great fit for the budget'}</div>
+            <button class="btn btn-secondary" style="margin-top: 8px; font-size: 11px; padding: 4px;" onclick="addPick('${r.option.id}')">Add to itinerary</button>
+          </div>`).join('') : '<div style="font-size: 13px; color: var(--text-muted);">Everything is planned!</div>';
+      } catch (err) {}
     }
-
-    // ── Checkout / payments / post-purchase ──
-    async function bookItem(itemId) {
-      showToast('💳 Checking each share against Visa spending rules...');
-      const { ok, json } = await postJson('/api/active/book', { itemId });
-      if (!ok || !json.length) return showToast('Booking failed');
-      const s = json[0];
-      const auto = s.shares.filter(x => x.action === 'AUTO_PURCHASE').length;
-      const ask = s.shares.filter(x => x.action === 'REQUIRE_APPROVAL').length;
-      showToast(s.outcome === 'ABORTED'
-        ? '🚫 Blocked by a hard limit. Nobody was charged.'
-        : `✅ ${auto} auto-approved · ${ask} approval request${ask === 1 ? '' : 's'} sent`);
-      await refreshAll();
-    }
-
-    async function cancelItem(itemId) {
-      if (!confirm('Cancel this booking and refund every member?')) return;
-      const { ok, json } = await postJson('/api/active/cancel', { itemId });
-      showToast(ok ? '↩ Cancelled. Refunds sent to each card.' : (json.reason || 'Could not cancel'));
-      await refreshAll();
-    }
-
-    async function simulateReply(approvalId, approve) {
-      await postJson(`/api/active/approvals/${approvalId}/simulate-reply`, { approve });
-      showToast(approve ? '✅ Approval received' : '❌ Declined, holds released');
-      await refreshAll();
-    }
-
-    async function toggleToken(userId, linked, name) {
-      if (linked) {
-        if (!confirm(`Revoke ${name}'s Visa agent credential? PICA won't be able to charge them.`)) return;
-        await postJson(`/api/users/${userId}/revoke-token`);
-        showToast('🔒 Credential revoked at Visa');
-      } else {
-        await postJson(`/api/users/${userId}/visa-token`, { agentTokenRef: 'tok_' + name.toLowerCase() + '_' + Date.now().toString(36) });
-        showToast('💳 New agent credential linked, rules synced to Visa');
-      }
-      await refreshAll();
-    }
-
-    // ── Wallet, loyalty & trust center ──
-    let walletData = null;
-    let walletTab = null;
 
     async function loadWallet() {
-      const res = await fetch('/api/active/wallet');
-      if (!res.ok) return;
-      walletData = await res.json();
-      if (!walletTab || !walletData.members.some(m => m.userId === walletTab)) walletTab = walletData.members[0]?.userId;
-      renderWallet();
-      renderAudit();
-      renderJourney();
+      try {
+        const res = await fetch('/api/active/wallet');
+        if (!res.ok) return;
+        walletData = await res.json();
+        
+        if (!walletTab || !walletData.members.some(m => m.userId === walletTab)) walletTab = walletData.members[0]?.userId;
+        renderWallet();
 
-      const pts = walletData.members.reduce((a, m) => a + m.rewards.points, 0);
-      const cb = walletData.members.reduce((a, m) => a + m.rewards.cashbackCents, 0);
-      document.getElementById('stat-rewards').textContent = `${pts} pts`;
-      document.getElementById('stat-cashback').textContent = `${usd(cb)} Visa offer cash back`;
+        const pts = walletData.members.reduce((a, m) => a + m.rewards.points, 0);
+        document.getElementById('stat-rewards').textContent = `${pts} pts`;
+
+        if (walletData.audit && walletData.audit.length) {
+          document.getElementById('audit-list').innerHTML = walletData.audit.map(a => `
+            <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 10px 12px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 800; color: #1e293b; font-size: 12px;">
+                <span>${a.member} booked ${a.item}</span>
+                <span>$${(a.amountCents/100).toFixed(2)}</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">PICA verified rules and charged Visa safely.</div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {}
     }
 
-    function selectWalletTab(id) { walletTab = id; renderWallet(); }
-
     function renderWallet() {
+      if (!walletData || !walletData.members) return;
       document.getElementById('wallet-tabs').innerHTML = walletData.members.map(m => {
         const n = m.pendingApprovals.length;
-        return `<button class="tab ${m.userId === walletTab ? 'active' : ''}" onclick="selectWalletTab('${m.userId}')">${esc(m.name)}${n ? ` · ${n} waiting` : ''}</button>`;
+        return `<button class="tab ${m.userId === walletTab ? 'active' : ''}" onclick="selectWalletTab('${m.userId}')">${esc(m.name)}${n ? ` (${n} wait)` : ''}</button>`;
       }).join('');
 
       const m = walletData.members.find(x => x.userId === walletTab);
       if (!m) return;
       const p = m.policy;
-      const tierPct = m.rewards.nextTier ? Math.round(100 * m.rewards.points / (m.rewards.points + m.rewards.pointsToNext)) : 100;
 
       document.getElementById('wallet-body').innerHTML = `
         <div class="visa-card ${m.token.linked ? '' : 'revoked'}">
           <div class="visa-header"><div class="visa-chip"></div><div class="visa-logo">VISA</div></div>
           <div class="visa-token">${esc(m.token.display)}</div>
-          <div class="visa-footer"><div>${m.token.linked ? 'Agent-scoped token · revocable' : 'Revoked · PICA cannot charge'}</div><div>${esc(m.name)}</div></div>
-        </div>
-        <div>
-          <button class="btn ${m.token.linked ? 'btn-danger' : 'btn-success'} btn-sm" onclick="toggleToken('${m.userId}', ${m.token.linked}, '${esc(m.name)}')">
-            ${m.token.linked ? '🔒 Revoke agent access' : '💳 Re-link card'}
-          </button>
+          <div class="visa-footer"><div>${m.token.linked ? 'Agent-scoped token' : 'Revoked'}</div><div>${esc(m.name)}</div></div>
         </div>
 
         ${m.pendingApprovals.length ? `<div class="section-label">Waiting on ${esc(m.name)}</div>` + m.pendingApprovals.map(a => `
           <div class="approval">
-            <div><strong>${esc(a.item)}</strong> · ${usd(a.amountCents)}</div>
-            <div class="muted" style="font-size: 11px;">Code sent by ${esc(a.channel)}, expires ${new Date(a.expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The code is never shown here.</div>
+            <div><strong>${esc(a.item)}</strong> ·${usd(a.amountCents)}</div>
             <div style="display: flex; gap: 6px;">
-              <button class="btn btn-success btn-sm" onclick="simulateReply('${a.approvalId}', true)">Simulate "YES" reply</button>
-              <button class="btn btn-danger btn-sm" onclick="simulateReply('${a.approvalId}', false)">Simulate "NO"</button>
+              <button class="btn btn-success btn-sm" onclick="simulateReply('${a.approvalId}', true)">Simulate YES</button>
+              <button class="btn btn-danger btn-sm" onclick="simulateReply('${a.approvalId}', false)">Simulate NO</button>
             </div>
           </div>`).join('') : ''}
 
-        <div class="section-label">Rules PICA must follow (also enforced by Visa)</div>
-        <div class="rule-item"><div class="rule-icon">⚡</div><div><strong>Auto-buy</strong> up to ${usd(p.autoApproveLimitCents)}${p.alwaysRequireApproval ? ' (off: always asks)' : ''}</div></div>
-        <div class="rule-item"><div class="rule-icon">🛡️</div><div><strong>Asks first</strong> above that${p.dailyLimitCents ? `, or past ${usd(p.dailyLimitCents)}/day` : ''}</div></div>
-        <div class="rule-item"><div class="rule-icon">🚫</div><div><strong>Hard cap</strong> ${usd(p.perTransactionMaxCents)} per purchase${p.blockedMerchants.length ? ` · blocked: ${esc(p.blockedMerchants.join(', '))}` : ''}</div></div>
-
-        <div class="section-label">Loyalty & rewards</div>
-        <div class="kv"><span>PICA points</span><span style="color: #fbbf24;">${m.rewards.points} · ${esc(m.rewards.tier)}</span></div>
-        <div class="tier-bar"><div style="width: ${tierPct}%;"></div></div>
-        <div class="muted" style="font-size: 11px;">${m.rewards.nextTier ? `${m.rewards.pointsToNext} pts to ${esc(m.rewards.nextTier)}` : 'Top tier reached'}</div>
-        <div class="kv"><span>Visa offer cash back</span><span style="color: #34d399;">${usd(m.rewards.cashbackCents)}</span></div>
-        <div class="kv"><span>Charged this trip</span><span>${usd(m.spentCents)}</span></div>
-        ${m.refundedCents ? `<div class="kv"><span>Refunded</span><span>${usd(m.refundedCents)}</span></div>` : ''}
-        <div class="muted" style="font-size: 11px;">🔐 PICA never sees a card number, only this revocable token. Likes and budgets are used to rank picks for this trip and nothing else.</div>
+        <div class="section-label">Rules PICA must follow</div>
+        <div class="rule-item"><div><strong>Auto-buy</strong> up to ${usd(p.autoApproveLimitCents)}${p.alwaysRequireApproval ? ' (off: always asks)' : ''}</div></div>
+        <div class="rule-item"><div><strong>Asks first</strong> above that${p.dailyLimitCents ? `, or past ${usd(p.dailyLimitCents)}/day` : ''}</div></div>
+        <div class="rule-item"><div><strong>Hard cap</strong> ${usd(p.perTransactionMaxCents)} per purchase</div></div>
       `;
     }
 
-    const DECISION_LABEL = { AUTO_PURCHASE: '⚡ Auto (within rules)', REQUIRE_APPROVAL: '🛡️ Needed approval', DECLINE: '🚫 Blocked' };
-    const STATUS_CLASS = { CAPTURED: 'PURCHASED', AUTHORIZED: 'PURCHASING', PENDING_APPROVAL: 'PURCHASING' };
+    function selectWalletTab(id) { walletTab = id; renderWallet(); }
 
-    function renderAudit() {
-      if (!walletData.audit.length) return;
-      const open = new Set([...document.querySelectorAll('#audit-list details[open]')].map(d => d.dataset.id));
-      document.getElementById('audit-list').innerHTML = walletData.audit.map(a => `
-        <details class="audit" data-id="${a.splitId}" ${open.has(a.splitId) ? 'open' : ''}>
-          <summary>
-            <span><strong>${esc(a.member)}</strong> · ${esc(a.item)}</span>
-            <span style="font-family: 'JetBrains Mono', monospace; white-space: nowrap;">${usd(a.amountCents)}</span>
-          </summary>
-          <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-            <span class="status-badge st-${STATUS_CLASS[a.status] || 'PROPOSED'}">${a.status.replace('_', ' ')}</span>
-            <span class="muted">${DECISION_LABEL[a.decision] || a.decision}</span>
-            ${a.consentType ? `<span class="muted">· consent: ${a.consentType === 'AUTO_RULE' ? 'rule checks' : 'member approval'}</span>` : ''}
-          </div>
-          <div class="muted" style="margin-top: 6px;">${esc(a.detail)}</div>
-          <div class="audit-checks">${a.checks.map(c => `<span class="check ${c.passed ? 'pass' : 'fail'}">${c.passed ? '✓' : '✗'} ${c.name}</span>`).join('')}</div>
-          ${a.visaAuthorizationId ? `<div class="muted" style="margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; overflow-wrap: anywhere;">Visa auth ${esc(a.visaAuthorizationId)}</div>` : ''}
-          ${a.rewardPoints ? `<div style="margin-top: 4px; color: #fbbf24;">+${a.rewardPoints} pts${a.cashbackCents ? ` · ${usd(a.cashbackCents)} back` : ''}</div>` : ''}
-        </details>`).join('');
+    async function postJson(url, body) {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+      return { ok: res.ok };
     }
 
-    // ── The 7 stages of the shopping journey, each with live state ──
-    function renderJourney() {
-      if (!activeTripData || !walletData) return;
-      const items = activeTripData.trip.items;
-      const booked = items.filter(i => i.status === 'PURCHASED').length;
-      const audit = walletData.audit;
-      const pending = walletData.members.reduce((a, m) => a + m.pendingApprovals.length, 0);
-      const pts = walletData.members.reduce((a, m) => a + m.rewards.points, 0);
-      const refunds = new Set(audit.filter(a => a.status === 'REFUNDED').map(a => a.item)).size;
-      const stages = [
-        ['Discovery', `${recCount} AI picks for this group`, recCount > 0],
-        ['Decision-making', 'Every pick explains why', recCount > 0],
-        ['Personalization', `${activeTripData.trip.members.length} members' tastes & budgets`, true],
-        ['Checkout', `${items.filter(i => i.status === 'PROPOSED').length} ready to book`, items.length > 0],
-        ['Payments', `${audit.filter(a => a.status === 'CAPTURED').length} captured · ${pending} awaiting`, audit.length > 0],
-        ['Loyalty & rewards', `${pts} pts earned`, pts > 0],
-        ['Post-purchase', `${booked} booked · ${refunds} refunded`, booked + refunds > 0],
-      ];
-      document.getElementById('journey').innerHTML = stages.map(([n, v, live]) =>
-        `<div class="stage ${live ? 'live' : ''}"><div class="stage-name">${n}</div><div class="stage-val">${esc(v)}</div></div>`).join('');
+    async function simulateReply(approvalId, approve) {
+      await postJson(`/api/active/approvals/${approvalId}/simulate-reply`, { approve });
+      showToast(approve ? 'Approval received' : 'Declined, holds released');
+      await refreshAll();
     }
 
-    async function refreshAll() {
-      await loadDashboard();
-      await Promise.all([loadWallet(), loadRecommendations()]);
-    }
+    async function addPick(id) { await fetch('/api/active/items', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ optionId: id, dayIndex: 1 }) }); refreshAll(); }
+    async function bookItem(id) { showToast('Checking rules...'); await fetch('/api/active/book', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itemId: id }) }); refreshAll(); }
 
+    async function refreshAll() { await loadDashboard(); await Promise.all([loadWallet(), loadRecommendations()]); }
+    
     refreshAll();
-    setInterval(async () => { await loadDashboard(); await loadWallet(); }, 2500);
-    setInterval(loadRecommendations, 10000);
+    setInterval(async () => { await loadDashboard(); await loadWallet(); }, 3000);
   </script>
 </body>
 </html>
