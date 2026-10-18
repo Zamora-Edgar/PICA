@@ -30,15 +30,15 @@ const fn = (name: string, description: string, properties: Record<string, unknow
   ({ type: "function", function: { name, description, parameters: { type: "object", properties, required } } }) as const;
 
 export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
-  fn("change_destination", "Change the trip's destination to another city ('San Diego', 'New York', or 'Florida/Miami'). Updates the trip location, resets unbooked itinerary items, and refreshes hotel and activity options for the new city.", {
-    destination: { type: "string", description: "The destination to switch to: 'San Diego', 'New York', or 'Florida'" },
-    tripName: { type: "string", description: "Optional new trip title, e.g. 'New York City Explorer'" },
+  fn("change_destination", "Change the trip's destination to ANY city or region in the world (e.g. 'Paris', 'Tokyo', 'London', 'Honolulu', 'Rome', 'San Diego', 'New York', 'Florida', etc.). Powered by LocationIQ for global geocoding and real-world place discovery. Updates the trip location, resets unbooked itinerary items, and refreshes options for the new city.", {
+    destination: { type: "string", description: "The global city or destination name, e.g. 'Paris', 'Tokyo', 'Rome', 'New York', 'San Diego', 'Florida'" },
+    tripName: { type: "string", description: "Optional new trip title, e.g. 'Parisian Holiday' or 'Tokyo Adventure'" },
   }, ["destination"]),
   fn("search_options", "Search bookable options. Use before adding or replacing anything; results are sorted cheapest first.", {
     category: { type: "string", enum: [...ITEM_CATEGORIES] },
     maxPriceCents: { type: "integer", description: "Max group total in cents" },
-    query: { type: "string", description: "Keyword, e.g. 'beach', 'broadway', 'budget'" },
-    destination: { type: "string", description: "Optional city filter: 'San Diego', 'New York', or 'Florida'" },
+    query: { type: "string", description: "Keyword, e.g. 'beach', 'museum', 'hotel', 'dinner', 'budget'" },
+    destination: { type: "string", description: "Optional city filter, e.g. 'Paris', 'Tokyo', 'San Diego', 'New York', 'Florida'" },
   }),
   fn("add_item", "Add a catalog option to the itinerary.", {
     optionId: { type: "string" },

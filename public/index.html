@@ -584,11 +584,15 @@
         if (trip.name) document.getElementById('trip-name').textContent = trip.name;
         if (trip.destination) {
           const dLower = trip.destination.toLowerCase();
-          const locText = dLower.includes('san diego')
-            ? 'San Diego, CA'
-            : dLower.includes('new york')
-              ? 'New York, NY'
-              : 'Miami, FL';
+          let locText = trip.destination;
+          if (dLower.includes('san diego')) locText = 'San Diego, CA';
+          else if (dLower.includes('new york')) locText = 'New York, NY';
+          else if (dLower.includes('florida') || dLower.includes('miami')) locText = 'Miami, FL';
+          else if (dLower.includes('paris')) locText = 'Paris, France';
+          else if (dLower.includes('tokyo')) locText = 'Tokyo, Japan';
+          else if (dLower.includes('london')) locText = 'London, UK';
+          else if (dLower.includes('rome')) locText = 'Rome, Italy';
+          else if (dLower.includes('honolulu')) locText = 'Honolulu, HI';
           document.getElementById('trip-dest').textContent = locText;
           loadDestinationImage(trip.destination);
           updateDestinationButtons(trip.destination);
