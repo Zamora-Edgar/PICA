@@ -11,7 +11,7 @@ import { buildWallet } from "../commerce/wallet";
 import { prisma } from "../db";
 import { formatUsd, ITEM_CATEGORIES, parseJsonArray } from "../domain/types";
 import { getMerchantOffers } from "../integrations/visa";
-import { getCatalogOption, searchCatalog } from "./catalog";
+import { CATALOG, getCatalogOption, matchesDestination, searchCatalog } from "./catalog";
 import { recommendForTrip } from "./recommender";
 import { computeCostBreakdown, loadTripSnapshot } from "./tripContext";
 
@@ -29,10 +29,15 @@ const fn = (name: string, description: string, properties: Record<string, unknow
   ({ type: "function", function: { name, description, parameters: { type: "object", properties, required } } }) as const;
 
 export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+  fn("change_destination", "Change the trip's destination to another city ('San Diego', 'New York', or 'Florida/Miami'). Updates the trip location, resets unbooked itinerary items, and refreshes hotel and activity options for the new city.", {
+    destination: { type: "string", description: "The destination to switch to: 'San Diego', 'New York', or 'Florida'" },
+    tripName: { type: "string", description: "Optional new trip title, e.g. 'New York City Explorer'" },
+  }, ["destination"]),
   fn("search_options", "Search bookable options. Use before adding or replacing anything; results are sorted cheapest first.", {
     category: { type: "string", enum: [...ITEM_CATEGORIES] },
     maxPriceCents: { type: "integer", description: "Max group total in cents" },
-    query: { type: "string", description: "Keyword, e.g. 'beach', 'history', 'budget'" },
+    query: { type: "string", description: "Keyword, e.g. 'beach', 'broadway', 'budget'" },
+    destination: { type: "string", description: "Optional city filter: 'San Diego', 'New York', or 'Florida'" },
   }),
   fn("add_item", "Add a catalog option to the itinerary.", {
     optionId: { type: "string" },
@@ -73,10 +78,15 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
 ];
 
 const schemas = {
+  change_destination: z.object({
+    destination: z.string(),
+    tripName: z.string().optional(),
+  }),
   search_options: z.object({
     category: z.enum(ITEM_CATEGORIES).optional(),
     maxPriceCents: z.number().int().positive().optional(),
     query: z.string().optional(),
+    destination: z.string().optional(),
   }),
   add_item: z.object({ optionId: z.string(), dayIndex: z.number().int().min(1) }),
   replace_item: z.object({ itemId: z.string(), optionId: z.string() }),
@@ -109,8 +119,65 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
   const args = parsed.data as any;
 
   switch (name as ToolName) {
-    case "search_options":
-      return { data: searchCatalog(args) };
+    case "change_destination": {
+      const raw = String(args.destination || "").toLowerCase();
+      let city: "San Diego" | "New York" | "Florida" = "San Diego";
+      let fullName = "San Diego Weekend Getaway";
+      if (raw.includes("new york") || raw.includes("nyc") || raw.includes("manhattan") || raw.includes("ny")) {
+        city = "New York";
+        fullName = "New York City Explorer";
+      } else if (raw.includes("florida") || raw.includes("miami") || raw.includes("orlando") || raw.includes("key west") || raw.includes("fl")) {
+        city = "Florida";
+        fullName = "Florida Sunshine Getaway";
+      }
+
+      const tripName = args.tripName || fullName;
+
+      // Update trip destination and title
+      await prisma.trip.update({
+        where: { id: ctx.tripId },
+        data: { destination: city, name: tripName },
+      });
+
+      // Clear proposed items from previous destination so itinerary matches the new city
+      await prisma.itineraryItem.deleteMany({
+        where: { tripId: ctx.tripId, status: "PROPOSED" },
+      });
+
+      // Auto-seed starter hotel for the new destination
+      const starterOptions = CATALOG.filter((o) => o.destination === city && o.category === "LODGING");
+      const starterHotel = starterOptions[1] || starterOptions[0];
+      if (starterHotel) {
+        await prisma.itineraryItem.create({
+          data: {
+            tripId: ctx.tripId,
+            dayIndex: 1,
+            category: starterHotel.category,
+            title: starterHotel.title,
+            description: starterHotel.description,
+            catalogOptionId: starterHotel.id,
+            merchantName: starterHotel.merchantName,
+            priceCents: starterHotel.priceCents,
+          },
+        });
+      }
+
+      return {
+        data: {
+          destination: city,
+          tripName,
+          starterHotel: starterHotel?.title,
+          message: `Destination switched to ${city}! Cleared previous items and selected ${starterHotel?.title || "new lodging"}.`,
+        },
+        itineraryChanged: true,
+      };
+    }
+
+    case "search_options": {
+      const trip = await prisma.trip.findUnique({ where: { id: ctx.tripId } });
+      const dest = args.destination || trip?.destination;
+      return { data: searchCatalog({ ...args, destination: dest }) };
+    }
 
     case "add_item": {
       const option = getCatalogOption(args.optionId);
@@ -191,8 +258,10 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
 
       // Step A: Lodging optimization
       const stayItem = trip.items.find((i) => i.category === "LODGING" && i.status === "PROPOSED");
-      if (stayItem && stayItem.priceCents > 36_000) {
-        const cheaper = getCatalogOption("htl_baixa_hostel");
+      if (stayItem) {
+        const destLodgings = CATALOG.filter((o) => o.category === "LODGING" && matchesDestination(o.destination, trip.destination))
+          .sort((a, b) => a.priceCents - b.priceCents);
+        const cheaper = destLodgings.find((o) => o.priceCents < stayItem.priceCents);
         if (cheaper) {
           await prisma.itineraryItem.update({
             where: { id: stayItem.id },
@@ -216,23 +285,25 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
       let speakerCost = costs.find((c) => c.userId === ctx.userId)?.totalCents ?? 0;
 
       if (speakerCost > targetCents) {
-        const expensiveAct = trip.items.find((i) => i.category === "ACTIVITY" && i.status === "PROPOSED" && i.priceCents >= 30_000);
+        const expensiveAct = trip.items.find((i) => i.category === "ACTIVITY" && i.status === "PROPOSED" && i.priceCents >= 20_000);
         if (expensiveAct) {
-          const beach = getCatalogOption("act_cascais_beach");
-          if (beach) {
+          const destActs = CATALOG.filter((o) => o.category === "ACTIVITY" && matchesDestination(o.destination, trip.destination))
+            .sort((a, b) => a.priceCents - b.priceCents);
+          const cheaperAct = destActs.find((o) => o.priceCents < expensiveAct.priceCents);
+          if (cheaperAct) {
             await prisma.itineraryItem.update({
               where: { id: expensiveAct.id },
               data: {
-                title: beach.title,
-                description: beach.description,
-                catalogOptionId: beach.id,
-                merchantName: beach.merchantName,
-                priceCents: beach.priceCents,
+                title: cheaperAct.title,
+                description: cheaperAct.description,
+                catalogOptionId: cheaperAct.id,
+                merchantName: cheaperAct.merchantName,
+                priceCents: cheaperAct.priceCents,
                 version: { increment: 1 },
               },
             });
-            const saved = Math.round((expensiveAct.priceCents - beach.priceCents) / 100);
-            changesMade.push(`Swapped ${expensiveAct.title} to ${beach.title} (saved $${saved} total)`);
+            const saved = Math.round((expensiveAct.priceCents - cheaperAct.priceCents) / 100);
+            changesMade.push(`Swapped ${expensiveAct.title} to ${cheaperAct.title} (saved $${saved} total)`);
           }
         }
       }
@@ -245,20 +316,22 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
       if (speakerCost > targetCents) {
         const expensiveFood = trip.items.find((i) => i.category === "FOOD" && i.status === "PROPOSED" && i.priceCents > 15_000);
         if (expensiveFood) {
-          const timeout = getCatalogOption("food_time_out");
-          if (timeout && expensiveFood.catalogOptionId !== "food_time_out") {
+          const destFoods = CATALOG.filter((o) => o.category === "FOOD" && matchesDestination(o.destination, trip.destination))
+            .sort((a, b) => a.priceCents - b.priceCents);
+          const cheaperFood = destFoods.find((o) => o.priceCents < expensiveFood.priceCents);
+          if (cheaperFood) {
             await prisma.itineraryItem.update({
               where: { id: expensiveFood.id },
               data: {
-                title: timeout.title,
-                description: timeout.description,
-                catalogOptionId: timeout.id,
-                merchantName: timeout.merchantName,
-                priceCents: timeout.priceCents,
+                title: cheaperFood.title,
+                description: cheaperFood.description,
+                catalogOptionId: cheaperFood.id,
+                merchantName: cheaperFood.merchantName,
+                priceCents: cheaperFood.priceCents,
                 version: { increment: 1 },
               },
             });
-            changesMade.push(`Swapped ${expensiveFood.title} to ${timeout.title}`);
+            changesMade.push(`Swapped ${expensiveFood.title} to ${cheaperFood.title}`);
           }
         }
       }

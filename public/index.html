@@ -284,9 +284,15 @@
     </div>
 
     <div class="action-bar">
-      <div style="display: flex; gap: 10px;">
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <button class="btn btn-primary" onclick="triggerAdjustBudget()">Auto-Optimize Budget</button>
         <button class="btn btn-secondary" onclick="triggerRemindAll()">Remind Group</button>
+        <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 6px;">
+          <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Destination:</span>
+          <button class="btn btn-secondary btn-sm" id="btn-dest-sd" onclick="setDestination('San Diego')">🌊 San Diego</button>
+          <button class="btn btn-secondary btn-sm" id="btn-dest-ny" onclick="setDestination('New York')">🗽 New York</button>
+          <button class="btn btn-secondary btn-sm" id="btn-dest-fl" onclick="setDestination('Florida')">🌴 Florida</button>
+        </div>
       </div>
       <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Auto-syncing every 2.5s</div>
     </div>
@@ -371,6 +377,8 @@
               <button class="btn btn-secondary btn-sm" onclick="quickSend('Find a beachfront hotel under $250')">🏨 Hotel</button>
               <button class="btn btn-secondary btn-sm" onclick="quickSend('Find a cheap dinner spot')">🌮 Dinner</button>
               <button class="btn btn-secondary btn-sm" onclick="quickSend('Who is over budget right now?')">📊 Budget</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickSend('What if we go to New York instead?')">🗽 Let\'s go to NYC</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickSend('Change our trip to Florida!')">🌴 Let\'s go to Florida</button>
             </div>
           </div>
         </div>
@@ -449,6 +457,47 @@
         if (res.ok) {
           showToast('✅ Sent reminders to all members!');
           await loadDashboard();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateDestinationButtons(dest) {
+      const d = (dest || '').toLowerCase();
+      const sdBtn = document.getElementById('btn-dest-sd');
+      const nyBtn = document.getElementById('btn-dest-ny');
+      const flBtn = document.getElementById('btn-dest-fl');
+      const setStyle = (btn, active) => {
+        if (!btn) return;
+        if (active) {
+          btn.style.background = 'var(--primary-gradient)';
+          btn.style.borderColor = 'rgba(161, 196, 253, 0.6)';
+          btn.style.fontWeight = '800';
+          btn.style.color = '#1e293b';
+        } else {
+          btn.style.background = '#ffffff';
+          btn.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+          btn.style.fontWeight = '600';
+          btn.style.color = 'var(--text)';
+        }
+      };
+      setStyle(sdBtn, d.includes('san diego'));
+      setStyle(nyBtn, d.includes('new york'));
+      setStyle(flBtn, d.includes('florida') || d.includes('miami'));
+    }
+
+    async function setDestination(city) {
+      try {
+        showToast(`✈️ Switching destination to ${city}...`);
+        const res = await fetch('/api/active/destination', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ destination: city })
+        });
+        if (res.ok) {
+          showToast(`✅ Trip adapted to ${city}!`);
+          await refreshAll();
         }
       } catch (err) {
         console.error(err);
@@ -534,8 +583,15 @@
         
         if (trip.name) document.getElementById('trip-name').textContent = trip.name;
         if (trip.destination) {
-          document.getElementById('trip-dest').textContent = trip.destination + ', CA';
+          const dLower = trip.destination.toLowerCase();
+          const locText = dLower.includes('san diego')
+            ? 'San Diego, CA'
+            : dLower.includes('new york')
+              ? 'New York, NY'
+              : 'Miami, FL';
+          document.getElementById('trip-dest').textContent = locText;
           loadDestinationImage(trip.destination);
+          updateDestinationButtons(trip.destination);
         }
         if (trip.members) document.getElementById('member-count').textContent = `${trip.members.length} Members`;
 

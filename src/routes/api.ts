@@ -268,6 +268,33 @@ apiRouter.post("/active/adjust-budget", handle(async (req, res) => {
   res.json({ ok: true, result });
 }));
 
+// Dashboard Action: Switch Destination (San Diego, New York, Florida)
+apiRouter.post("/active/destination", handle(async (req, res) => {
+  const { destination } = z.object({ destination: z.string().min(1) }).parse(req.body);
+  const trip = await prisma.trip.findFirst({ where: { status: { in: ["PLANNING", "BOOKING"] } }, orderBy: { createdAt: "desc" } });
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const organizerId = trip.organizerId;
+  const { executeTool } = await import("../agent/tools");
+  const { broadcastItineraryUpdate } = await import("../notifications");
+  const result = await executeTool("change_destination", { destination }, { tripId: trip.id, userId: organizerId });
+
+  // Record an outbound message from PICA
+  await prisma.message.create({
+    data: {
+      tripId: trip.id,
+      userId: organizerId,
+      channel: "imessage",
+      direction: "OUTBOUND",
+      body: `🌴 Destination updated to ${(result.data as any).destination}! I have updated your itinerary and refreshed recommended hotels and activities.`,
+    },
+  });
+
+  if (result.itineraryChanged) {
+    await broadcastItineraryUpdate(trip.id, organizerId, `Destination changed to ${(result.data as any).destination}`);
+  }
+  res.json({ ok: true, result });
+}));
+
 // Dashboard Action: Send a message into the conversation thread (from web)
 apiRouter.post("/active/message", handle(async (req, res) => {
   const { text, userId } = z.object({ text: z.string().min(1), userId: z.string().optional() }).parse(req.body);

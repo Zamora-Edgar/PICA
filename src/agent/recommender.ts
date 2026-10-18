@@ -13,7 +13,7 @@
  */
 import { formatUsd, parseJsonArray, type ItemCategory } from "../domain/types";
 import type { VisaOffer } from "../integrations/visa";
-import { CATALOG, type CatalogOption } from "./catalog";
+import { CATALOG, matchesDestination, type CatalogOption } from "./catalog";
 import { quoteReward } from "../commerce/rewards";
 import { computeCostBreakdown, type TripSnapshot } from "./tripContext";
 
@@ -62,7 +62,12 @@ export function recommendForTrip(
   const inPlan = new Set(trip.items.map((i) => i.catalogOptionId));
   const overBudgetCount = costs.filter((c) => c.overBudgetByCents > 0).length;
 
-  const ranked = CATALOG.filter((o) => !inPlan.has(o.id) && (!filter.category || o.category === filter.category)).map((option) => {
+  const ranked = CATALOG.filter(
+    (o) =>
+      matchesDestination(o.destination, trip.destination) &&
+      !inPlan.has(o.id) &&
+      (!filter.category || o.category === filter.category),
+  ).map((option) => {
     const perPersonCents = Math.ceil(option.priceCents / memberCount);
     const matchedLikes: Recommendation["matchedLikes"] = [];
     const dislikeHits: Recommendation["dislikeHits"] = [];
