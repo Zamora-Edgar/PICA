@@ -326,30 +326,6 @@
       </div>
     </div>
 
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-      <div class="hero-meta">
-        <h2 id="trip-name">San Diego Weekend Getaway</h2>
-        <div class="hero-tags">
-          <div class="hero-tag">📍 <span id="trip-dest">San Diego, CA</span></div>
-          <div class="hero-tag">📅 <span id="trip-dates">Oct 24 – Oct 25, 2026</span></div>
-          <div class="hero-tag">👥 <span id="member-count">3 Members</span></div>
-          <div class="hero-tag">☀️ 74°F Sunny & Breezy</div>
-        </div>
-      </div>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <div class="photon-pill" onclick="copyPhotonNumber()" title="Click to copy text number">
-          <div class="label">💬 Text PICA (iMessage / SMS)</div>
-          <div class="number">+1 (628) 316-6196</div>
-        </div>
-        <div class="photon-pill" style="border-color: rgba(16, 185, 129, 0.35); background: rgba(16, 185, 129, 0.1);" onclick="copyVoiceNumber()" title="Click to copy voice number">
-          <div class="label" style="color: #6ee7b7;">🎙️ Call PICA (Photon SIP Voice)</div>
-          <div class="number" style="color: #34d399;">+1 (424) 437-8955</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Grid -->
     <div class="main-grid">
       <!-- Left Column: Planning Data -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -496,6 +472,19 @@
       sendSimMessage();
     }
 
+    function showTypingIndicator() {
+      const feed = document.getElementById('message-feed');
+      if (feed.innerHTML.includes('Listening for messages')) feed.innerHTML = '';
+      feed.innerHTML += `
+        <div class="msg-bubble is-pica" id="typing-indicator" style="width: fit-content; padding: 8px 14px;">
+          <div class="msg-header"><span class="msg-author">PICA Agent</span></div>
+          <div class="typing-indicator">
+            <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+          </div>
+        </div>`;
+      feed.scrollTop = feed.scrollHeight;
+    }
+
     async function sendSimMessage() {
       const input = document.getElementById('sim-text');
       const text = input.value.trim();
@@ -523,9 +512,6 @@
       }
     }
 
-    async function triggerAdjustBudget() { showToast('Optimizing trip...'); await fetch('/api/active/adjust-budget', { method: 'POST' }); loadDashboard(); }
-    async function triggerRemindAll() { showToast('Reminding group...'); await fetch('/api/active/remind', { method: 'POST' }); loadDashboard(); }
-    function copyPhotonNumber() { navigator.clipboard.writeText('+16283166196'); showToast('Copied number!'); }
     const usd = cents => '$' + (cents / 100).toFixed(2);
     function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
