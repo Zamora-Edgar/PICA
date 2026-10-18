@@ -183,7 +183,21 @@
       background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 14px; padding: 16px;
       display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
     }
-    .member-avatar { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; background: #e2e8f0; }
+    
+    /* Initial Avatars */
+    .initial-avatar { 
+      display: flex; align-items: center; justify-content: center; 
+      width: 36px; height: 36px; border-radius: 10px; 
+      background: #e2e8f0; color: #1e293b; 
+      font-weight: 800; font-size: 16px; 
+    }
+    .chat-initial { 
+      display: flex; align-items: center; justify-content: center; 
+      width: 20px; height: 20px; border-radius: 6px; 
+      background: #e2e8f0; color: #1e293b; 
+      font-weight: 800; font-size: 10px; 
+    }
+
     .progress-bar-bg { height: 6px; width: 100%; background: rgba(0, 0, 0, 0.05); border-radius: 999px; overflow: hidden; }
     .progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
 
@@ -197,7 +211,6 @@
     .msg-bubble:not(.is-pica) { border-bottom-right-radius: 4px; }
     
     .msg-header { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
-    .chat-avatar { width: 20px; height: 20px; border-radius: 6px; object-fit: cover; }
     .msg-author { font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 6px; }
     
     /* Typing Indicator */
@@ -316,7 +329,7 @@
     </div>
 
     <div class="main-grid">
-      <!-- Left Column: Planning Data -->
+      <!-- Left Column: Planning Data (Now with Chat) -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
         <div class="card">
           <div style="display: flex; justify-content: space-between;">
@@ -326,29 +339,7 @@
           <div class="members-grid" id="members-list"></div>
         </div>
 
-        <div class="card">
-          <div style="display: flex; justify-content: space-between;">
-            <div class="card-title">Handpicked for you by PICA</div>
-            <select class="sim-select" id="rec-category" onchange="loadRecommendations()">
-              <option value="">All categories</option>
-              <option value="ACTIVITY">Activities</option>
-              <option value="FOOD">Food</option>
-            </select>
-          </div>
-          <div style="font-size: 13px; color: var(--text-muted);">PICA ranks these based on what everyone likes and what everyone can afford.</div>
-          <div class="rec-grid" id="rec-list"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Group Itinerary</div>
-          <div class="itinerary-list" id="itinerary-list"></div>
-        </div>
-      </div>
-
-      <!-- Right Column: Conversational Agent & Trust -->
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        
-        <!-- Live Chat -->
+        <!-- Live Chat (Moved to Left Column) -->
         <div class="card">
           <div style="display: flex; justify-content: space-between;">
             <div class="card-title">Live Agent Thread</div>
@@ -381,6 +372,24 @@
               <button class="btn btn-secondary btn-sm" onclick="quickSend('Change our trip to Florida!')">🌴 Let\'s go to Florida</button>
             </div>
           </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Group Itinerary</div>
+          <div class="itinerary-list" id="itinerary-list"></div>
+        </div>
+      </div>
+
+      <!-- Right Column: Conversational Agent & Trust (Now with Recommendations) -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- Recommendations (Moved to Right Column, Dropdown Removed) -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <div class="card-title">Handpicked for you by PICA</div>
+          </div>
+          <div style="font-size: 13px; color: var(--text-muted);">PICA ranks these based on what everyone likes and what everyone can afford.</div>
+          <div class="rec-grid" id="rec-list"></div>
         </div>
 
         <!-- Visa Wallet -->
@@ -638,7 +647,7 @@
               <div class="member-item">
                 <div style="display: flex; justify-content: space-between;">
                   <div style="display: flex; gap: 10px; align-items: center;">
-                    <img class="member-avatar" src="https://i.pravatar.cc/150?u=${m.user.name.replace(/\s/g,'')}" alt="Avatar">
+                    <div class="initial-avatar">${m.user.name.charAt(0).toUpperCase()}</div>
                     <div>
                       <div style="font-weight: 800; font-size: 15px; color: #1e293b;">${m.user.name} ${m.role === 'ORGANIZER' ? '<span style="font-size:11px; font-weight:600; color:var(--text-muted);">(Organizer)</span>' : ''}</div>
                       <div style="font-size: 11px; background: rgba(161, 196, 253, 0.2); color: #2563eb; padding: 2px 6px; border-radius: 4px; display: inline-block;">${channel}</div>
@@ -665,7 +674,7 @@
             const name = isPica ? 'PICA' : (msg.user?.name || 'Member');
             const avatar = isPica 
               ? '<div style="background:#93a5cf; color:white; width:20px; height:20px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold;">P</div>' 
-              : `<img src="https://i.pravatar.cc/150?u=${name.replace(/\s/g,'')}" class="chat-avatar">`;
+              : `<div class="chat-initial">${name.charAt(0).toUpperCase()}</div>`;
             
             return `
               <div class="msg-bubble ${isPica ? 'is-pica' : ''}">
