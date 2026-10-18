@@ -144,7 +144,8 @@
       cursor: pointer; transition: all 0.2s ease;
       backdrop-filter: blur(4px);
     }
-    .photon-pill:hover { background: #ffffff; }
+    .photon-pill:hover { background: #ffffff; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05); }
+    .photon-pill.voice-pill:hover { background: rgba(16, 185, 129, 0.15) !important; }
     .photon-pill .label { font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 800; display: flex; align-items: center; gap: 6px; }
     .photon-pill .number { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 800; color: #0f172a; }
 
@@ -288,9 +289,15 @@
           <div class="hero-tag">74°F Sunny & Breezy</div>
         </div>
       </div>
-      <div class="photon-pill" onclick="copyPhotonNumber()">
-        <div class="label">Text PICA on iMessage / SMS</div>
-        <div class="number">+1 (628) 316-6196</div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <div class="photon-pill" onclick="copyPhotonNumber()" title="Click to copy text line">
+          <div class="label">💬 Text PICA (iMessage / SMS)</div>
+          <div class="number">+1 (628) 316-6196</div>
+        </div>
+        <div class="photon-pill voice-pill" onclick="copyVoiceNumber()" title="Click to copy voice line" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25);">
+          <div class="label" style="color: #059669;">🎙️ Call PICA (Photon SIP Voice)</div>
+          <div class="number" style="color: #059669;">+1 (424) 437-8955</div>
+        </div>
       </div>
     </div>
 
@@ -382,6 +389,11 @@
               </select>
               <input type="text" class="sim-input" id="sim-text" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendSimMessage()">
               <button class="btn btn-primary" style="padding: 6px 12px;" onclick="sendSimMessage()">Send</button>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="quickSend('Find a beachfront hotel under $250')">🏨 Hotel</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickSend('Find a cheap dinner spot')">🌮 Dinner</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickSend('Who is over budget right now?')">📊 Budget</button>
             </div>
           </div>
         </div>
@@ -573,6 +585,9 @@
           healthEl.textContent = 'Budget exceeded!';
           healthEl.style.color = '#dc2626';
         }
+        if (lowestBudget < 999999) {
+          document.getElementById('stat-budget-cap').textContent = maxUsage <= 1.0 ? `Lowest Member Cap: ${usd(lowestBudget)}` : 'One or more members over budget';
+        }
 
         if (trip.members) {
           document.getElementById('members-list').innerHTML = trip.members.map((m) => {
@@ -580,6 +595,7 @@
             const ratio = Math.min(100, Math.round((c.totalCents / c.budgetCents) * 100));
             const color = ratio > 100 ? '#dc2626' : ratio > 85 ? '#d97706' : '#059669';
             const left = ((c.budgetCents - c.totalCents) / 100).toFixed(0);
+            const channel = (m.user.preferredChannel || 'SMS').toUpperCase();
             
             return `
               <div class="member-item">
@@ -588,7 +604,7 @@
                     <img class="member-avatar" src="https://i.pravatar.cc/150?u=${m.user.name.replace(/\s/g,'')}" alt="Avatar">
                     <div>
                       <div style="font-weight: 800; font-size: 15px; color: #1e293b;">${m.user.name} ${m.role === 'ORGANIZER' ? '<span style="font-size:11px; font-weight:600; color:var(--text-muted);">(Organizer)</span>' : ''}</div>
-                      <div style="font-size: 11px; background: rgba(161, 196, 253, 0.2); color: #2563eb; padding: 2px 6px; border-radius: 4px; display: inline-block;">${m.user.preferredChannel.toUpperCase()}</div>
+                      <div style="font-size: 11px; background: rgba(161, 196, 253, 0.2); color: #2563eb; padding: 2px 6px; border-radius: 4px; display: inline-block;">${channel}</div>
                     </div>
                   </div>
                   <div style="text-align: right; font-size: 18px; font-weight: 800; color: #059669;">$${(c.totalCents/100).toFixed(2)}</div>
@@ -606,7 +622,8 @@
 
         const feed = document.getElementById('message-feed');
         if (messages && messages.length > 0) {
-          feed.innerHTML = messages.map(msg => {
+          const displayMsgs = messages.slice().reverse();
+          feed.innerHTML = displayMsgs.map(msg => {
             const isPica = msg.direction === 'OUTBOUND';
             const name = isPica ? 'PICA' : (msg.user?.name || 'Member');
             const avatar = isPica 
@@ -617,6 +634,7 @@
               <div class="msg-bubble ${isPica ? 'is-pica' : ''}">
                 <div class="msg-header">
                   <span class="msg-author">${avatar} ${name}</span>
+                  <span style="font-size: 10px; margin-left: auto; color: var(--text-muted);">${(msg.channel || 'SMS').toUpperCase()}</span>
                 </div>
                 <div class="msg-text">${String(msg.body).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))}</div>
               </div>`;
@@ -667,8 +685,10 @@
         if (!walletTab || !walletData.members.some(m => m.userId === walletTab)) walletTab = walletData.members[0]?.userId;
         renderWallet();
 
-        const pts = walletData.members.reduce((a, m) => a + m.rewards.points, 0);
+        const pts = walletData.members.reduce((a, m) => a + (m.rewards?.points || 0), 0);
         document.getElementById('stat-rewards').textContent = `${pts} pts`;
+        const cb = walletData.members.reduce((a, m) => a + (m.rewards?.cashbackCents || 0), 0);
+        document.getElementById('stat-cashback').textContent = `${usd(cb)} cash back on offers`;
 
         if (walletData.audit && walletData.audit.length) {
           document.getElementById('audit-list').innerHTML = walletData.audit.map(a => `
