@@ -83,19 +83,7 @@
     }
     .logo-title p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
 
-    .header-badges { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
-      color: #059669; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
-    }
-    .visa-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);
-      color: #d97706; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
-    }
-    .pulse-dot { width: 8px; height: 8px; background: #059669; border-radius: 50%; box-shadow: 0 0 8px #059669; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+
 
     /* Hero Banner */
     .hero-banner {
@@ -145,7 +133,6 @@
       backdrop-filter: blur(4px);
     }
     .photon-pill:hover { background: #ffffff; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05); }
-    .photon-pill.voice-pill:hover { background: rgba(16, 185, 129, 0.15) !important; }
     .photon-pill .label { font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 800; display: flex; align-items: center; gap: 6px; }
     .photon-pill .number { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 800; color: #0f172a; }
 
@@ -273,10 +260,6 @@
           <p>Autonomous Group Travel · Powered by Photon 2.0 & Visa Intelligent Commerce</p>
         </div>
       </div>
-      <div class="header-badges">
-        <div class="status-pill"><div class="pulse-dot"></div><span>Photon 2.0 Multi-Channel Live</span></div>
-        <div class="visa-pill"><span>Visa Intelligent Commerce</span></div>
-      </div>
     </header>
 
     <div class="hero-banner">
@@ -286,7 +269,6 @@
           <div class="hero-tag"><span id="trip-dest">San Diego, CA</span></div>
           <div class="hero-tag"><span id="trip-dates">Oct 24 – Oct 25, 2026</span></div>
           <div class="hero-tag"><span id="member-count">3 Members</span></div>
-          <div class="hero-tag">74°F Sunny & Breezy</div>
         </div>
       </div>
       <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
@@ -294,9 +276,9 @@
           <div class="label">💬 Text PICA (iMessage / SMS)</div>
           <div class="number">+1 (628) 316-6196</div>
         </div>
-        <div class="photon-pill voice-pill" onclick="copyVoiceNumber()" title="Click to copy voice line" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25);">
-          <div class="label" style="color: #059669;">🎙️ Call PICA (Photon SIP Voice)</div>
-          <div class="number" style="color: #059669;">+1 (424) 437-8955</div>
+        <div class="photon-pill" onclick="copyVoiceNumber()" title="Click to copy voice line">
+          <div class="label">🎙️ Call PICA (Photon SIP Voice)</div>
+          <div class="number">+1 (424) 437-8955</div>
         </div>
       </div>
     </div>
@@ -324,11 +306,6 @@
         <div class="metric-label">Budget check</div>
         <div class="metric-val" style="color: #059669;" id="stat-budget-health">Looking good!</div>
         <div class="metric-sub" id="stat-budget-cap">Everyone is under budget</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Visa Rewards</div>
-        <div class="metric-val" style="color: #d97706;" id="stat-rewards">0 pts</div>
-        <div class="metric-sub" id="stat-cashback">$0.00 cash back on offers</div>
       </div>
     </div>
 
@@ -686,9 +663,11 @@
         renderWallet();
 
         const pts = walletData.members.reduce((a, m) => a + (m.rewards?.points || 0), 0);
-        document.getElementById('stat-rewards').textContent = `${pts} pts`;
+        const ptsEl = document.getElementById('stat-rewards');
+        if (ptsEl) ptsEl.textContent = `${pts} pts`;
         const cb = walletData.members.reduce((a, m) => a + (m.rewards?.cashbackCents || 0), 0);
-        document.getElementById('stat-cashback').textContent = `${usd(cb)} cash back on offers`;
+        const cbEl = document.getElementById('stat-cashback');
+        if (cbEl) cbEl.textContent = `${usd(cb)} cash back on offers`;
 
         if (walletData.audit && walletData.audit.length) {
           document.getElementById('audit-list').innerHTML = walletData.audit.map(a => `
