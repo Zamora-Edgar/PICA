@@ -10,7 +10,8 @@
     "db:seed": "tsx src/demo/seed.ts",
     "typecheck": "tsc --noEmit",
     "demo:trust": "tsx src/commerce/trustLayer.demo.ts",
-    "demo:flow": "tsx src/demo/flow.demo.ts"
+    "demo:flow": "tsx src/demo/flow.demo.ts",
+    "demo:journey": "tsx src/demo/journey.demo.ts"
   },
   "dependencies": {
     "@photon-ai/api": "^0.5.0",

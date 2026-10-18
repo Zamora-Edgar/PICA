@@ -100,6 +100,52 @@ export async function voidAuthorization(authorizationId: string): Promise<void> 
   await visaPost(`/vic/v1/payments/${authorizationId}/void`, {}, `void_${authorizationId}`);
 }
 
+/** Post-purchase: return a captured share to the card it came from (cancellation). */
+export async function refundPayment(authorizationId: string, amountCents: number, reason: string): Promise<{ refundId: string }> {
+  if (config.visa.mock) {
+    log("refund", authorizationId, amountCents, reason);
+    return { refundId: `rfnd_mock_${randomUUID()}` };
+  }
+  // 🔌 VISA
+  return visaPost(`/vic/v1/payments/${authorizationId}/refund`, { amount: { value: amountCents / 100 }, reason }, `rfnd_${authorizationId}`);
+}
+
+/**
+ * Kill switch: revoke the agent-scoped credential. After this the network declines any
+ * charge PICA attempts with it, whatever our own code does. The user's real card is untouched.
+ */
+export async function revokeAgentToken(agentTokenRef: string): Promise<void> {
+  if (config.visa.mock) return log("token revoked", agentTokenRef);
+  // 🔌 VISA
+  await visaPost(`/vic/v1/agent-tokens/${agentTokenRef}/revoke`, {});
+}
+
+/** A card-linked merchant offer (Visa Merchant Offers): cash back credited at settlement. */
+export interface VisaOffer {
+  id: string;
+  merchantName: string;
+  headline: string;
+  cashbackPercent: number;
+  maxCashbackCents: number;
+  pointsMultiplier: number; // PICA points multiplier on top of the base 1 pt / $1
+}
+
+// Mock offer feed for the San Diego catalog. Merchant names must match catalog.ts.
+const MOCK_OFFERS: VisaOffer[] = [
+  { id: "vo_coronado_10", merchantName: "Hotel del Coronado", headline: "10% back on stays with Visa", cashbackPercent: 10, maxCashbackCents: 10_000, pointsMultiplier: 2 },
+  { id: "vo_surf_15", merchantName: "San Diego Surf Academy", headline: "15% back on group lessons", cashbackPercent: 15, maxCashbackCents: 3_000, pointsMultiplier: 3 },
+  { id: "vo_ptloma_5", merchantName: "Point Loma Seafoods", headline: "5% back + 2x points on dinner", cashbackPercent: 5, maxCashbackCents: 2_000, pointsMultiplier: 2 },
+  { id: "vo_sail_8", merchantName: "Sail San Diego Charters", headline: "8% back on sunset sails", cashbackPercent: 8, maxCashbackCents: 2_500, pointsMultiplier: 2 },
+];
+
+/** Offers for the trip region. Cached in-process: offers change daily, not per request. */
+let offerCache: VisaOffer[] | undefined;
+export async function getMerchantOffers(): Promise<VisaOffer[]> {
+  if (config.visa.mock) return MOCK_OFFERS;
+  // 🔌 VISA: Visa Merchant Offers Resource Center (VMORC) — offers by region/merchant
+  return (offerCache ??= (await visaPost<{ offers: VisaOffer[] }>("/vmorc/offers/v1/byfilter", { region: "US-CA-San Diego" })).offers);
+}
+
 async function visaPost<T = unknown>(path: string, body: unknown, idempotencyKey?: string): Promise<T> {
   const basic = Buffer.from(`${config.visa.userId}:${config.visa.password}`).toString("base64");
   const res = await fetch(`${config.visa.apiBase}${path}`, {

@@ -92,6 +92,33 @@ The orchestration around it is in [`purchaseOrchestrator.ts`](src/commerce/purch
 
 ---
 
+## 5. The Visa shopping journey
+Every stage of the journey runs end to end, live on the dashboard (the strip at the top lights up as each stage happens) and over chat.
+
+| Stage | What PICA does | Code |
+|---|---|---|
+| **Discovery** | "Suggest something" → ranked picks from real inventory, never invented | [`recommender.ts`](src/agent/recommender.ts), `recommend_options` tool |
+| **Decision-making** | Every pick lists its reasons: whose likes it matches, budget fit, Visa offer, who dislikes it | [`recommender.ts`](src/agent/recommender.ts) |
+| **Personalization** | Scored on each member's likes, dislikes and *remaining* budget from the invite form | [`recommender.ts`](src/agent/recommender.ts) |
+| **Checkout** | "Book with Visa" / "book the surf lesson" → per-person split, each share checked against that person's rules | [`purchaseOrchestrator.ts`](src/commerce/purchaseOrchestrator.ts) |
+| **Payments** | Agent-scoped Visa token, authorize → capture all or void all, consent evidence on every authorization | [`visa.ts`](src/integrations/visa.ts), [`trustLayer.ts`](src/commerce/trustLayer.ts) |
+| **Loyalty & rewards** | 1 pt per $1 + Visa card-linked merchant offers (cash back, point multipliers), tiers | [`rewards.ts`](src/commerce/rewards.ts), `getMerchantOffers` |
+| **Post-purchase** | Personal receipt per member, "cancel surf" → refunds every share to its card and reverses points (free until 48h before the trip) | `cancelBooking` in [`purchaseOrchestrator.ts`](src/commerce/purchaseOrchestrator.ts) |
+
+**Trust & responsibility on the dashboard (Visa Wallet & Trust Center):**
+- **Kill switch.** "Revoke agent access" revokes the Visa credential. From then on every purchase for that member is hard-declined until they re-link.
+- **Audit trail.** Every trust-layer decision, with each rule check it passed or failed, the consent type (rule checks or member approval) and the Visa authorization id.
+- **Approval codes never reach the browser.** The dashboard's "Simulate YES" button looks the code up on the server and sends it through the same deterministic handler as a real text.
+- **Data minimization.** Picks use only likes, dislikes and budgets for this trip. No card numbers, no browsing history.
+
+```bash
+npm run demo:journey
+```
+
+That runs all seven stages plus the kill switch on the seeded San Diego trip in mock mode, with no API keys. Chat commands that work without an LLM: `suggest something`, `rewards`, `cancel <item>`.
+
+---
+
 ## Run it
 
 ```bash
@@ -104,6 +131,10 @@ cp .env.example .env
 
 ```bash
 npx prisma db push
+```
+
+```bash
+npm run db:seed
 ```
 
 ```bash

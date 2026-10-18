@@ -701,6 +701,118 @@
       border-color: #3b82f6;
     }
 
+    /* Shopping journey strip */
+    .journey {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+    @media (max-width: 960px) { .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .stage {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .stage.live { border-color: rgba(245, 158, 11, 0.45); box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.15) inset; }
+    .stage-name { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #fbbf24; }
+    .stage-val { font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+
+    /* Recommendations */
+    .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .rec {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rec-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .rec-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 12px;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 8px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+    .why { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); }
+    .why li::before { content: '→ '; color: #60a5fa; }
+    .offer-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .status-badge { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .st-PROPOSED { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+    .st-PURCHASING, .st-FINALIZING { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .st-PURCHASED { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 8px; }
+    .btn-danger { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.22); }
+    .btn-success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .btn-success:hover { background: rgba(16, 185, 129, 0.25); }
+
+    /* Wallet & trust center */
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .tab.active { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
+    .visa-card.revoked { filter: grayscale(1); opacity: 0.6; }
+    .kv { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+    .kv span:first-child { color: var(--text-muted); }
+    .kv span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 700; text-align: right; }
+    .section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .approval {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .audit-list { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+    .audit {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .audit summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; list-style: none; }
+    .audit summary::-webkit-details-marker { display: none; }
+    .audit-checks { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .check { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+    .check.pass { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .check.fail { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    .muted { color: var(--text-muted); }
+    .tier-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+    .tier-bar div { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
     /* Toast Notification */
     #toast {
       position: fixed;
@@ -759,6 +871,9 @@
       </div>
     </div>
 
+    <!-- Visa shopping journey: every stage, live -->
+    <div class="journey" id="journey"></div>
+
     <!-- Live Metrics Strip -->
     <div class="metrics-grid">
       <div class="metric-card">
@@ -775,6 +890,11 @@
         <div class="metric-label">🛡️ Budget Health</div>
         <div class="metric-val" style="color: #34d399;" id="stat-budget-health">100% Fit</div>
         <div class="metric-sub" id="stat-budget-cap">Lowest Member Cap: $300</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">🎁 Visa Rewards Earned</div>
+        <div class="metric-val" style="color: #fbbf24;" id="stat-rewards">0 pts</div>
+        <div class="metric-sub" id="stat-cashback">$0.00 Visa offer cash back</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">✈️ Trip Countdown</div>
@@ -815,6 +935,22 @@
           </div>
         </div>
 
+        <!-- AI Picks: discovery, personalization, decision support -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✨ AI Picks for Your Group</div>
+            <select class="sim-select" id="rec-category" onchange="loadRecommendations()">
+              <option value="">All categories</option>
+              <option value="ACTIVITY">Activities</option>
+              <option value="FOOD">Food</option>
+              <option value="LODGING">Lodging</option>
+              <option value="TRANSPORT">Transport</option>
+            </select>
+          </div>
+          <div class="muted" style="font-size: 12px;">Ranked on each member's likes, dislikes and remaining budget, plus Visa offers. Every pick shows why.</div>
+          <div class="rec-grid" id="rec-list"></div>
+        </div>
+
         <!-- Itinerary Card -->
         <div class="card">
           <div class="card-header">
@@ -829,35 +965,25 @@
 
       <!-- Right Column: Visa Guardrails & Live Feed -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
-        <!-- Visa Guardrail Card -->
+        <!-- Visa Wallet & Trust Center -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">💳 Visa Intelligent Commerce</div>
+            <div class="card-title">💳 Visa Wallet & Trust Center</div>
           </div>
-          <div class="visa-card">
-            <div class="visa-header">
-              <div class="visa-chip"></div>
-              <div class="visa-logo">VISA</div>
-            </div>
-            <div class="visa-token">•••• •••• •••• 8821</div>
-            <div class="visa-footer">
-              <div>Agent Auth Scoped Token</div>
-              <div>Expires: 10/28</div>
-            </div>
+          <div class="tabs" id="wallet-tabs"></div>
+          <div id="wallet-body" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="muted" style="font-size: 13px;">Loading wallet...</div>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div class="rule-item">
-              <div class="rule-icon">⚡</div>
-              <div><strong>Auto-Purchase:</strong> Up to $50/person instantly</div>
-            </div>
-            <div class="rule-item">
-              <div class="rule-icon">🛡️</div>
-              <div><strong>Approval Required:</strong> $50 – $300 (via SMS 2FA)</div>
-            </div>
-            <div class="rule-item">
-              <div class="rule-icon">🚫</div>
-              <div><strong>Hard Ceiling Cap:</strong> Over $1,000 strictly blocked</div>
-            </div>
+        </div>
+
+        <!-- Audit trail: every trust-layer decision with its consent evidence -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🛡️ Payment Audit Trail</div>
+            <div class="muted" style="font-size: 11px;">Tap a row for every rule check</div>
+          </div>
+          <div class="audit-list" id="audit-list">
+            <div class="muted" style="font-size: 13px;">No payment decisions yet. Book an item to see the trust layer at work.</div>
           </div>
         </div>
 
@@ -883,6 +1009,8 @@
               <span class="chip" onclick="quickSend('Adjust to my budget')">Adjust to budget</span>
               <span class="chip" onclick="quickSend('Remind everyone')">Remind group</span>
               <span class="chip" onclick="quickSend('My budget is $300')">My budget is $300</span>
+              <span class="chip" onclick="quickSend('Suggest something')">Suggest something</span>
+              <span class="chip" onclick="quickSend('Rewards')">Rewards</span>
             </div>
             <div class="sim-input-row">
               <select class="sim-select" id="sim-user">
@@ -1082,22 +1210,33 @@
 
         // Itinerary Render
         const itList = document.getElementById('itinerary-list');
+        const offers = data.offers || [];
         itList.innerHTML = activeItems.map(it => {
           const itemTotalUsd = (it.priceCents / 100).toFixed(2);
-          const perPersonUsd = (it.priceCents / 100 / memberCount).toFixed(2);
+          const optOuts = JSON.parse(it.optOutUserIds || '[]').length;
+          const perPersonUsd = (it.priceCents / 100 / Math.max(1, memberCount - optOuts)).toFixed(2);
+          const offer = offers.find(o => o.merchantName.toLowerCase() === it.merchantName.toLowerCase());
+          const action = it.status === 'PROPOSED'
+            ? `<button class="btn btn-warning btn-sm" onclick="bookItem('${it.id}')">💳 Book with Visa</button>`
+            : it.status === 'PURCHASED'
+              ? `<button class="btn btn-danger btn-sm" onclick="cancelItem('${it.id}')">↩ Cancel & refund</button>`
+              : `<span class="muted" style="font-size: 11px;">Waiting on approvals</span>`;
           return `
             <div class="itinerary-item">
               <div class="item-meta">
                 <div class="item-title-row">
                   <span class="day-badge">Day ${it.dayIndex}</span>
-                  <span class="item-title">${it.title}</span>
+                  <span class="item-title">${esc(it.title)}</span>
                   <span class="category-badge cat-${it.category}">${it.category}</span>
+                  <span class="status-badge st-${it.status}">${it.status === 'PURCHASED' ? 'Booked' : it.status.toLowerCase()}</span>
                 </div>
-                <div class="item-desc">${it.description || it.merchantName}</div>
+                <div class="item-desc">${esc(it.description || it.merchantName)}</div>
+                ${offer ? `<div><span class="offer-badge">VISA OFFER · ${esc(offer.headline)}</span></div>` : ''}
               </div>
-              <div class="item-cost-box">
+              <div class="item-cost-box" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                 <div class="item-total">$${itemTotalUsd}</div>
                 <div class="item-split">$${perPersonUsd}/person</div>
+                ${action}
               </div>
             </div>
           `;
@@ -1115,7 +1254,7 @@
                   <span class="msg-author">${isPica ? '⚡ ' : '👤 '}${author}</span>
                   <span>${(msg.channel || 'imessage').toUpperCase()}</span>
                 </div>
-                <div class="msg-text">${msg.body}</div>
+                <div class="msg-text">${esc(msg.body)}</div>
               </div>
             `;
           }).join('');
@@ -1125,8 +1264,215 @@
       }
     }
 
-    loadDashboard();
-    setInterval(loadDashboard, 2500);
+    function esc(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    const usd = cents => '$' + (cents / 100).toFixed(2);
+
+    async function postJson(url, body) {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+      const json = await res.json().catch(() => ({}));
+      return { ok: res.ok, json };
+    }
+
+    // ── Discovery / personalization / decision-making ──
+    let recCount = 0;
+    async function loadRecommendations() {
+      const cat = document.getElementById('rec-category').value;
+      const res = await fetch('/api/active/recommendations' + (cat ? `?category=${cat}` : ''));
+      if (!res.ok) return;
+      const recs = await res.json();
+      recCount = recs.length;
+      const days = activeTripData && activeTripData.trip.items.length ? Math.max(...activeTripData.trip.items.map(i => i.dayIndex)) : 1;
+      document.getElementById('rec-list').innerHTML = recs.length ? recs.map(r => `
+        <div class="rec">
+          <div class="rec-top">
+            <div>
+              <div class="item-title">${esc(r.option.title)}</div>
+              <div class="muted" style="font-size: 12px;">${usd(r.perPersonCents)}/person · ${esc(r.option.merchantName)}</div>
+            </div>
+            <span class="rec-score" title="Match score">${r.score}% match</span>
+          </div>
+          ${r.offer ? `<div><span class="offer-badge">VISA OFFER · ${esc(r.offer.headline)}</span></div>` : ''}
+          <ul class="why">${r.reasons.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <span class="muted" style="font-size: 11px;">Earns ~${r.pointsPerPerson} pts/person</span>
+            <span style="flex: 1;"></span>
+            ${Array.from({ length: days }, (_, i) => `<button class="btn btn-secondary btn-sm" onclick="addPick('${r.option.id}', ${i + 1})">+ Day ${i + 1}</button>`).join('')}
+          </div>
+        </div>`).join('') : '<div class="muted" style="font-size: 13px;">Everything we would recommend is already in the plan.</div>';
+      renderJourney();
+    }
+
+    async function addPick(optionId, dayIndex) {
+      const { ok } = await postJson('/api/active/items', { optionId, dayIndex });
+      showToast(ok ? '✨ Added to the plan, group notified' : 'Could not add that pick');
+      await refreshAll();
+    }
+
+    // ── Checkout / payments / post-purchase ──
+    async function bookItem(itemId) {
+      showToast('💳 Checking each share against Visa spending rules...');
+      const { ok, json } = await postJson('/api/active/book', { itemId });
+      if (!ok || !json.length) return showToast('Booking failed');
+      const s = json[0];
+      const auto = s.shares.filter(x => x.action === 'AUTO_PURCHASE').length;
+      const ask = s.shares.filter(x => x.action === 'REQUIRE_APPROVAL').length;
+      showToast(s.outcome === 'ABORTED'
+        ? '🚫 Blocked by a hard limit. Nobody was charged.'
+        : `✅ ${auto} auto-approved · ${ask} approval request${ask === 1 ? '' : 's'} sent`);
+      await refreshAll();
+    }
+
+    async function cancelItem(itemId) {
+      if (!confirm('Cancel this booking and refund every member?')) return;
+      const { ok, json } = await postJson('/api/active/cancel', { itemId });
+      showToast(ok ? '↩ Cancelled. Refunds sent to each card.' : (json.reason || 'Could not cancel'));
+      await refreshAll();
+    }
+
+    async function simulateReply(approvalId, approve) {
+      await postJson(`/api/active/approvals/${approvalId}/simulate-reply`, { approve });
+      showToast(approve ? '✅ Approval received' : '❌ Declined, holds released');
+      await refreshAll();
+    }
+
+    async function toggleToken(userId, linked, name) {
+      if (linked) {
+        if (!confirm(`Revoke ${name}'s Visa agent credential? PICA won't be able to charge them.`)) return;
+        await postJson(`/api/users/${userId}/revoke-token`);
+        showToast('🔒 Credential revoked at Visa');
+      } else {
+        await postJson(`/api/users/${userId}/visa-token`, { agentTokenRef: 'tok_' + name.toLowerCase() + '_' + Date.now().toString(36) });
+        showToast('💳 New agent credential linked, rules synced to Visa');
+      }
+      await refreshAll();
+    }
+
+    // ── Wallet, loyalty & trust center ──
+    let walletData = null;
+    let walletTab = null;
+
+    async function loadWallet() {
+      const res = await fetch('/api/active/wallet');
+      if (!res.ok) return;
+      walletData = await res.json();
+      if (!walletTab || !walletData.members.some(m => m.userId === walletTab)) walletTab = walletData.members[0]?.userId;
+      renderWallet();
+      renderAudit();
+      renderJourney();
+
+      const pts = walletData.members.reduce((a, m) => a + m.rewards.points, 0);
+      const cb = walletData.members.reduce((a, m) => a + m.rewards.cashbackCents, 0);
+      document.getElementById('stat-rewards').textContent = `${pts} pts`;
+      document.getElementById('stat-cashback').textContent = `${usd(cb)} Visa offer cash back`;
+    }
+
+    function selectWalletTab(id) { walletTab = id; renderWallet(); }
+
+    function renderWallet() {
+      document.getElementById('wallet-tabs').innerHTML = walletData.members.map(m => {
+        const n = m.pendingApprovals.length;
+        return `<button class="tab ${m.userId === walletTab ? 'active' : ''}" onclick="selectWalletTab('${m.userId}')">${esc(m.name)}${n ? ` · ${n} waiting` : ''}</button>`;
+      }).join('');
+
+      const m = walletData.members.find(x => x.userId === walletTab);
+      if (!m) return;
+      const p = m.policy;
+      const tierPct = m.rewards.nextTier ? Math.round(100 * m.rewards.points / (m.rewards.points + m.rewards.pointsToNext)) : 100;
+
+      document.getElementById('wallet-body').innerHTML = `
+        <div class="visa-card ${m.token.linked ? '' : 'revoked'}">
+          <div class="visa-header"><div class="visa-chip"></div><div class="visa-logo">VISA</div></div>
+          <div class="visa-token">${esc(m.token.display)}</div>
+          <div class="visa-footer"><div>${m.token.linked ? 'Agent-scoped token · revocable' : 'Revoked · PICA cannot charge'}</div><div>${esc(m.name)}</div></div>
+        </div>
+        <div>
+          <button class="btn ${m.token.linked ? 'btn-danger' : 'btn-success'} btn-sm" onclick="toggleToken('${m.userId}', ${m.token.linked}, '${esc(m.name)}')">
+            ${m.token.linked ? '🔒 Revoke agent access' : '💳 Re-link card'}
+          </button>
+        </div>
+
+        ${m.pendingApprovals.length ? `<div class="section-label">Waiting on ${esc(m.name)}</div>` + m.pendingApprovals.map(a => `
+          <div class="approval">
+            <div><strong>${esc(a.item)}</strong> · ${usd(a.amountCents)}</div>
+            <div class="muted" style="font-size: 11px;">Code sent by ${esc(a.channel)}, expires ${new Date(a.expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The code is never shown here.</div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-success btn-sm" onclick="simulateReply('${a.approvalId}', true)">Simulate "YES" reply</button>
+              <button class="btn btn-danger btn-sm" onclick="simulateReply('${a.approvalId}', false)">Simulate "NO"</button>
+            </div>
+          </div>`).join('') : ''}
+
+        <div class="section-label">Rules PICA must follow (also enforced by Visa)</div>
+        <div class="rule-item"><div class="rule-icon">⚡</div><div><strong>Auto-buy</strong> up to ${usd(p.autoApproveLimitCents)}${p.alwaysRequireApproval ? ' (off: always asks)' : ''}</div></div>
+        <div class="rule-item"><div class="rule-icon">🛡️</div><div><strong>Asks first</strong> above that${p.dailyLimitCents ? `, or past ${usd(p.dailyLimitCents)}/day` : ''}</div></div>
+        <div class="rule-item"><div class="rule-icon">🚫</div><div><strong>Hard cap</strong> ${usd(p.perTransactionMaxCents)} per purchase${p.blockedMerchants.length ? ` · blocked: ${esc(p.blockedMerchants.join(', '))}` : ''}</div></div>
+
+        <div class="section-label">Loyalty & rewards</div>
+        <div class="kv"><span>PICA points</span><span style="color: #fbbf24;">${m.rewards.points} · ${esc(m.rewards.tier)}</span></div>
+        <div class="tier-bar"><div style="width: ${tierPct}%;"></div></div>
+        <div class="muted" style="font-size: 11px;">${m.rewards.nextTier ? `${m.rewards.pointsToNext} pts to ${esc(m.rewards.nextTier)}` : 'Top tier reached'}</div>
+        <div class="kv"><span>Visa offer cash back</span><span style="color: #34d399;">${usd(m.rewards.cashbackCents)}</span></div>
+        <div class="kv"><span>Charged this trip</span><span>${usd(m.spentCents)}</span></div>
+        ${m.refundedCents ? `<div class="kv"><span>Refunded</span><span>${usd(m.refundedCents)}</span></div>` : ''}
+        <div class="muted" style="font-size: 11px;">🔐 PICA never sees a card number, only this revocable token. Likes and budgets are used to rank picks for this trip and nothing else.</div>
+      `;
+    }
+
+    const DECISION_LABEL = { AUTO_PURCHASE: '⚡ Auto (within rules)', REQUIRE_APPROVAL: '🛡️ Needed approval', DECLINE: '🚫 Blocked' };
+    const STATUS_CLASS = { CAPTURED: 'PURCHASED', AUTHORIZED: 'PURCHASING', PENDING_APPROVAL: 'PURCHASING' };
+
+    function renderAudit() {
+      if (!walletData.audit.length) return;
+      const open = new Set([...document.querySelectorAll('#audit-list details[open]')].map(d => d.dataset.id));
+      document.getElementById('audit-list').innerHTML = walletData.audit.map(a => `
+        <details class="audit" data-id="${a.splitId}" ${open.has(a.splitId) ? 'open' : ''}>
+          <summary>
+            <span><strong>${esc(a.member)}</strong> · ${esc(a.item)}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; white-space: nowrap;">${usd(a.amountCents)}</span>
+          </summary>
+          <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+            <span class="status-badge st-${STATUS_CLASS[a.status] || 'PROPOSED'}">${a.status.replace('_', ' ')}</span>
+            <span class="muted">${DECISION_LABEL[a.decision] || a.decision}</span>
+            ${a.consentType ? `<span class="muted">· consent: ${a.consentType === 'AUTO_RULE' ? 'rule checks' : 'member approval'}</span>` : ''}
+          </div>
+          <div class="muted" style="margin-top: 6px;">${esc(a.detail)}</div>
+          <div class="audit-checks">${a.checks.map(c => `<span class="check ${c.passed ? 'pass' : 'fail'}">${c.passed ? '✓' : '✗'} ${c.name}</span>`).join('')}</div>
+          ${a.visaAuthorizationId ? `<div class="muted" style="margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; overflow-wrap: anywhere;">Visa auth ${esc(a.visaAuthorizationId)}</div>` : ''}
+          ${a.rewardPoints ? `<div style="margin-top: 4px; color: #fbbf24;">+${a.rewardPoints} pts${a.cashbackCents ? ` · ${usd(a.cashbackCents)} back` : ''}</div>` : ''}
+        </details>`).join('');
+    }
+
+    // ── The 7 stages of the shopping journey, each with live state ──
+    function renderJourney() {
+      if (!activeTripData || !walletData) return;
+      const items = activeTripData.trip.items;
+      const booked = items.filter(i => i.status === 'PURCHASED').length;
+      const audit = walletData.audit;
+      const pending = walletData.members.reduce((a, m) => a + m.pendingApprovals.length, 0);
+      const pts = walletData.members.reduce((a, m) => a + m.rewards.points, 0);
+      const refunds = new Set(audit.filter(a => a.status === 'REFUNDED').map(a => a.item)).size;
+      const stages = [
+        ['Discovery', `${recCount} AI picks for this group`, recCount > 0],
+        ['Decision-making', 'Every pick explains why', recCount > 0],
+        ['Personalization', `${activeTripData.trip.members.length} members' tastes & budgets`, true],
+        ['Checkout', `${items.filter(i => i.status === 'PROPOSED').length} ready to book`, items.length > 0],
+        ['Payments', `${audit.filter(a => a.status === 'CAPTURED').length} captured · ${pending} awaiting`, audit.length > 0],
+        ['Loyalty & rewards', `${pts} pts earned`, pts > 0],
+        ['Post-purchase', `${booked} booked · ${refunds} refunded`, booked + refunds > 0],
+      ];
+      document.getElementById('journey').innerHTML = stages.map(([n, v, live]) =>
+        `<div class="stage ${live ? 'live' : ''}"><div class="stage-name">${n}</div><div class="stage-val">${esc(v)}</div></div>`).join('');
+    }
+
+    async function refreshAll() {
+      await loadDashboard();
+      await Promise.all([loadWallet(), loadRecommendations()]);
+    }
+
+    refreshAll();
+    setInterval(async () => { await loadDashboard(); await loadWallet(); }, 2500);
+    setInterval(loadRecommendations, 10000);
   </script>
 </body>
 </html>

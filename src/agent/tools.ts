@@ -6,10 +6,13 @@
  */
 import type OpenAI from "openai";
 import { z } from "zod";
-import { initiatePurchase } from "../commerce/purchaseOrchestrator";
+import { cancelBooking, initiatePurchase } from "../commerce/purchaseOrchestrator";
+import { buildWallet } from "../commerce/wallet";
 import { prisma } from "../db";
-import { ITEM_CATEGORIES, parseJsonArray } from "../domain/types";
+import { formatUsd, ITEM_CATEGORIES, parseJsonArray } from "../domain/types";
+import { getMerchantOffers } from "../integrations/visa";
 import { getCatalogOption, searchCatalog } from "./catalog";
+import { recommendForTrip } from "./recommender";
 import { computeCostBreakdown, loadTripSnapshot } from "./tripContext";
 
 export interface ToolContext {
@@ -57,6 +60,13 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     memberName: { type: "string", description: "Specific member to remind (e.g. 'Omar', 'Jairo'), or 'all' to alert everyone who hasn't confirmed yet." },
     message: { type: "string", description: "Optional custom note to include in the reminder." },
   }),
+  fn("recommend_options", "Personalized picks for THIS group, ranked by members' likes/dislikes, remaining budgets and Visa offers, each with reasons. Use for 'what should we do', 'suggest something', 'what's best for us'.", {
+    category: { type: "string", enum: [...ITEM_CATEGORIES] },
+  }),
+  fn("get_rewards", "The speaker's Visa wallet: PICA points, loyalty tier, Visa offer cash back, receipts and pending approvals.", {}),
+  fn("cancel_booking", "Cancel a BOOKED (purchased) item and refund every member's share to their card. Only when a member explicitly asks to cancel something already booked.", {
+    itemId: { type: "string" },
+  }, ["itemId"]),
   fn("request_purchase", "Start booking items. Only when a member explicitly asks to book/buy. Each person's share is checked against their Visa spending rules; some may need their approval.", {
     itemIds: { type: "array", items: { type: "string" }, minItems: 1 },
   }, ["itemIds"]),
@@ -85,6 +95,9 @@ const schemas = {
     memberName: z.string().optional(),
     message: z.string().optional(),
   }),
+  recommend_options: z.object({ category: z.enum(ITEM_CATEGORIES).optional() }),
+  get_rewards: z.object({}),
+  cancel_booking: z.object({ itemId: z.string() }),
   request_purchase: z.object({ itemIds: z.array(z.string()).min(1) }),
 };
 type ToolName = keyof typeof schemas;
@@ -326,6 +339,39 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
           message: `Sent reminders to: ${remindedNames.join(", ")}`,
         },
       };
+    }
+
+    case "recommend_options": {
+      const recs = recommendForTrip(await loadTripSnapshot(ctx.tripId), await getMerchantOffers(), { category: args.category, limit: 3 });
+      return {
+        data: recs.map((r) => ({
+          optionId: r.option.id,
+          title: r.option.title,
+          perPerson: formatUsd(r.perPersonCents),
+          score: r.score,
+          why: r.reasons,
+        })),
+      };
+    }
+
+    case "get_rewards": {
+      const me = (await buildWallet(ctx.tripId)).members.find((m) => m.userId === ctx.userId);
+      if (!me) return { data: { error: "Not a member of this trip." } };
+      return {
+        data: {
+          points: me.rewards.points,
+          tier: me.rewards.tier,
+          pointsToNextTier: me.rewards.nextTier ? `${me.rewards.pointsToNext} to ${me.rewards.nextTier}` : "top tier",
+          visaCashback: formatUsd(me.rewards.cashbackCents),
+          spentOnTrip: formatUsd(me.spentCents),
+          pendingApprovals: me.pendingApprovals.map((a) => `${a.item}: ${formatUsd(a.amountCents)}`),
+        },
+      };
+    }
+
+    case "cancel_booking": {
+      const result = await cancelBooking(ctx.tripId, args.itemId);
+      return { data: result, itineraryChanged: result.ok };
     }
 
     case "request_purchase": {

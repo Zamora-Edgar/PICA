@@ -107,7 +107,10 @@ export async function handleInboundMessage(event: PhotonInboundEvent): Promise<v
       `• "My budget is $300" → Update your budget limit\n` +
       `• "Remind everyone" → Alert group members to confirm\n` +
       `• "Make [item] cheaper" → Swap for an affordable option\n` +
-      `• "Book [item]" → Trigger Visa trust layer purchase`;
+      `• "Book [item]" → Trigger Visa trust layer purchase\n` +
+      `• "Suggest something" → Personalized picks for the group, with reasons\n` +
+      `• "Rewards" → Your points, tier & Visa offer cash back\n` +
+      `• "Cancel [item]" → Cancel a booking & refund everyone`;
   } else if (lower === "summary" || lower === "itinerary" || lower === "plan" || lower === "show plan" || lower === "what's the plan" || lower === "what is the plan") {
     // Fast path: Instant structured summary
     const { loadTripSnapshot, computeCostBreakdown } = await import("../agent/tripContext");
@@ -165,6 +168,35 @@ export async function handleInboundMessage(event: PhotonInboundEvent): Promise<v
       `Changes:\n` + (data.changes ?? []).map((c: string) => `• ${c}`).join("\n") + `\n\n` +
       `💵 Your new share: ${data.newShare} (Budget: ${data.targetBudget})\n` +
       `New group splits: ${(data.allCosts ?? []).join(", ")}`;
+  } else if (["rewards", "my rewards", "points", "my points", "receipts", "wallet"].includes(lower)) {
+    // Fast path: loyalty & receipts
+    const data = (await executeTool("get_rewards", {}, { tripId: trip.id, userId: user.id })).data as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    replyText = data.error ?? `🎁 PICA Rewards for ${user.name}\n\n` +
+      `• ${data.points} points · ${data.tier} tier (${data.pointsToNextTier})\n` +
+      `• Visa offer cash back: ${data.visaCashback}\n` +
+      `• Booked on this trip: ${data.spentOnTrip}\n` +
+      (data.pendingApprovals.length ? `• Waiting on you: ${data.pendingApprovals.join(", ")}` : `• Nothing waiting on your approval`);
+  } else if (/^(suggest|recommend)/.test(lower) || lower.includes("what should we do")) {
+    // Fast path: personalized recommendations
+    const data = (await executeTool("recommend_options", {}, { tripId: trip.id, userId: user.id })).data as { title: string; perPerson: string; why: string[] }[];
+    replyText = data.length
+      ? `✨ Picks for your group:\n\n` +
+        data.map((r, i) => `${i + 1}. ${r.title} (${r.perPerson}/person)\n   ${r.why.join(" · ")}`).join("\n\n") +
+        `\n\nWant me to add one? Just say which.`
+      : "Your plan already has everything I'd recommend 🙌";
+  } else if (lower.startsWith("cancel ")) {
+    // Fast path: cancel a booking by (part of) its name
+    const words = lower.slice(7).split(/\s+/).filter((w) => w.length > 2 && w !== "the");
+    const booked = await prisma.itineraryItem.findMany({ where: { tripId: trip.id, status: "PURCHASED" } });
+    const match = booked.find((i) => words.some((w) => i.title.toLowerCase().includes(w)));
+    if (!match) {
+      replyText = booked.length
+        ? `Which booking? Booked so far: ${booked.map((i) => i.title).join(", ")}.`
+        : "Nothing is booked yet, so there's nothing to cancel.";
+    } else {
+      const data = (await executeTool("cancel_booking", { itemId: match.id }, { tripId: trip.id, userId: user.id })).data as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      replyText = data.ok ? `Done: ${match.title} is cancelled and everyone's refund is on its way.` : `I couldn't cancel it: ${data.reason}`;
+    }
   } else {
     // 5. Everything else goes to the agent with the full cross-channel context.
     const result = await runAgent({

@@ -119,7 +119,7 @@ model ItineraryItem {
   priceCents     Int // total for all participants
   currency       String    @default("USD")
   optOutUserIds  String    @default("[]") // JSON string[]: members not doing / not paying for this item
-  status         String    @default("PROPOSED") // PROPOSED | PURCHASING | FINALIZING | PURCHASED | REMOVED
+  status         String    @default("PROPOSED") // PROPOSED | PURCHASING | FINALIZING | PURCHASED | CANCELLED | REMOVED
   version        Int       @default(1) // bumped on every agent edit
 
   splits ExpenseSplit[]
@@ -138,12 +138,21 @@ model ExpenseSplit {
   userId              String
   user                User      @relation(fields: [userId], references: [id])
   amountCents         Int
-  status              String    @default("PENDING_APPROVAL") // PENDING_APPROVAL | AUTHORIZED | CAPTURED | DECLINED | VOIDED | FAILED
+  status              String    @default("PENDING_APPROVAL") // PENDING_APPROVAL | AUTHORIZED | CAPTURED | DECLINED | VOIDED | FAILED | REFUNDED
   decision            String // AUTO_PURCHASE | REQUIRE_APPROVAL | DECLINE (trust-layer verdict)
   decisionDetail      String // human-readable reasons; sent to the user and kept for audit
+  ruleChecks          String    @default("[]") // JSON {name, passed}[]: every trust-layer check, for the audit trail
+  consentType         String? // AUTO_RULE | HUMAN_APPROVAL — the consent evidence sent to Visa
   visaAuthorizationId String?
   authorizedAt        DateTime?
   failureReason       String?
+
+  // Loyalty & post-purchase (set at capture / refund)
+  visaOfferId         String? // Visa card-linked offer applied to this share, if any
+  cashbackCents       Int       @default(0) // statement credit from that offer
+  rewardPoints        Int       @default(0) // PICA points earned on this share
+  capturedAt          DateTime?
+  refundedAt          DateTime?
 
   approval ApprovalRequest?
 

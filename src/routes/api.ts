@@ -5,14 +5,17 @@
 import { randomBytes } from "node:crypto";
 import express, { Router, type NextFunction, type Request, type Response } from "express";
 import { z } from "zod";
+import { recommendForTrip } from "../agent/recommender";
 import { computeCostBreakdown, loadTripSnapshot } from "../agent/tripContext";
+import { cancelBooking, initiatePurchase } from "../commerce/purchaseOrchestrator";
 import { policyFromRecord } from "../commerce/trustLayer";
+import { buildWallet } from "../commerce/wallet";
 import { config } from "../config";
 import { prisma } from "../db";
 import { ITEM_CATEGORIES } from "../domain/types";
 import { linkDefaultIdentities, normalizeAddress } from "../identity";
 import { CHANNELS, createInviteLink } from "../integrations/photon";
-import { syncAgentControls } from "../integrations/visa";
+import { getMerchantOffers, revokeAgentToken, syncAgentControls } from "../integrations/visa";
 import { notifyUser } from "../notifications";
 
 export const apiRouter = Router();
@@ -148,7 +151,85 @@ apiRouter.get("/active", handle(async (_req, res) => {
     take: 25,
     include: { user: true },
   });
-  res.json({ trip: snapshot, costs: computeCostBreakdown(snapshot), messages });
+  res.json({ trip: snapshot, costs: computeCostBreakdown(snapshot), messages, offers: await getMerchantOffers() });
+}));
+
+const activeTrip = () =>
+  prisma.trip.findFirst({ where: { status: { in: ["PLANNING", "BOOKING"] } }, orderBy: { createdAt: "desc" } });
+
+// ─── Visa shopping journey ───────────────────────────────────────────────────
+
+// Discovery + personalization + decision support: ranked picks with the reasons behind them.
+apiRouter.get("/active/recommendations", handle(async (req, res) => {
+  const trip = await activeTrip();
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const category = z.enum(ITEM_CATEGORIES).optional().parse(req.query.category || undefined);
+  res.json(recommendForTrip(await loadTripSnapshot(trip.id), await getMerchantOffers(), { category, limit: 4 }));
+}));
+
+// Add a recommended option to the plan.
+apiRouter.post("/active/items", handle(async (req, res) => {
+  const trip = await activeTrip();
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const { optionId, dayIndex } = z.object({ optionId: z.string(), dayIndex: z.number().int().min(1) }).parse(req.body);
+  const { executeTool } = await import("../agent/tools");
+  const { broadcastItineraryUpdate } = await import("../notifications");
+  const result = await executeTool("add_item", { optionId, dayIndex }, { tripId: trip.id, userId: trip.organizerId });
+  if (result.itineraryChanged) await broadcastItineraryUpdate(trip.id, trip.organizerId, `Added a recommended pick for day ${dayIndex}`);
+  res.json(result.data);
+}));
+
+// Checkout: run an item through the trust layer → Visa (auto-buy or approval per member).
+apiRouter.post("/active/book", handle(async (req, res) => {
+  const trip = await activeTrip();
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const { itemId } = z.object({ itemId: z.string() }).parse(req.body);
+  res.json(await initiatePurchase(trip.id, [itemId]));
+}));
+
+// Post-purchase: cancel a booking and refund everyone.
+apiRouter.post("/active/cancel", handle(async (req, res) => {
+  const trip = await activeTrip();
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  const { itemId } = z.object({ itemId: z.string() }).parse(req.body);
+  const result = await cancelBooking(trip.id, itemId);
+  res.status(result.ok ? 200 : 409).json(result);
+}));
+
+// Wallet & Trust Center: tokens, rules, rewards, receipts, pending approvals, audit trail.
+apiRouter.get("/active/wallet", handle(async (_req, res) => {
+  const trip = await activeTrip();
+  if (!trip) return res.status(404).json({ error: "No active trip" });
+  res.json(await buildWallet(trip.id));
+}));
+
+// DEMO ONLY: stands in for the member replying "YES 1234" on their phone. The code is looked
+// up here on the server and fed through the normal inbound pipeline, so the browser never
+// sees it and the deterministic approval handler is the one that decides.
+apiRouter.post("/active/approvals/:id/simulate-reply", handle(async (req, res) => {
+  const { approve } = z.object({ approve: z.boolean() }).parse(req.body);
+  const approval = await prisma.approvalRequest.findUnique({ where: { id: req.params.id }, include: { user: true } });
+  if (!approval || approval.status !== "PENDING") return res.status(404).json({ error: "No pending approval" });
+  const { handleInboundMessage } = await import("../webhooks/photonWebhook");
+  await handleInboundMessage({
+    eventId: `sim_${approval.id}_${Date.now()}`,
+    channel: approval.channel as (typeof CHANNELS)[number],
+    from: approval.user.phoneE164,
+    to: config.photon.agentHandle,
+    text: `${approve ? "YES" : "NO"} ${approval.code}`,
+  });
+  res.json({ ok: true });
+}));
+
+// Kill switch: revoke the member's agent credential at Visa. PICA can no longer charge them;
+// every future purchase is hard-declined (AGENT_TOKEN_LINKED) until they re-link.
+apiRouter.post("/users/:id/revoke-token", handle(async (req, res) => {
+  const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!user) return res.status(404).json({ error: "User not found" });
+  if (user.visaAgentTokenRef) await revokeAgentToken(user.visaAgentTokenRef); // 🔌 VISA
+  await prisma.user.update({ where: { id: user.id }, data: { visaAgentTokenRef: null } });
+  await notifyUser(user.id, "🔒 Your Visa agent credential for PICA has been revoked. I can't charge your card until you link it again.");
+  res.json({ revoked: true });
 }));
 
 // Dashboard Action: Nudge / Remind all members to confirm

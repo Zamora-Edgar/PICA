@@ -11,6 +11,9 @@
  *                                                                          │
  *                                      all AUTHORIZED ─► capture all ─► PURCHASED
  *                                      any DECLINED   ─► void all holds ─► back to PROPOSED
+ *
+ *   capture also records each member's loyalty rewards (points + Visa offer cash back) and
+ *   sends them a receipt; cancelBooking refunds every captured share (post-purchase).
  */
 import { randomInt } from "node:crypto";
 import { config } from "../config";
@@ -18,6 +21,7 @@ import { prisma } from "../db";
 import { formatUsd, parseJsonArray, type ItemCategory } from "../domain/types";
 import * as visa from "../integrations/visa";
 import { notifyTrip, notifyUser } from "../notifications";
+import { quoteReward } from "./rewards";
 import { participantsFor, splitEvenly } from "./splits";
 import { evaluatePurchase, policyFromRecord, type PurchaseDecision } from "./trustLayer";
 
@@ -101,6 +105,7 @@ export async function initiatePurchase(tripId: string, itemIds: string[]): Promi
           status: "PENDING_APPROVAL",
           decision: decision.action,
           decisionDetail: decision.summary,
+          ruleChecks: JSON.stringify(decision.checks.map((c) => ({ name: c.name, passed: c.passed }))),
         },
       });
 
@@ -174,7 +179,7 @@ async function authorizeSplit(splitId: string, consent: visa.ConsentEvidence): P
   await prisma.expenseSplit.update({
     where: { id: splitId },
     data: result.approved
-      ? { status: "AUTHORIZED", visaAuthorizationId: result.authorizationId, authorizedAt: new Date() }
+      ? { status: "AUTHORIZED", visaAuthorizationId: result.authorizationId, authorizedAt: new Date(), consentType: consent.type }
       : { status: "FAILED", failureReason: result.declineReason },
   });
 }
@@ -218,13 +223,71 @@ export async function finalizeItemIfComplete(itemId: string): Promise<void> {
     return;
   }
 
+  const offers = await visa.getMerchantOffers();
+  const receipts = [];
   for (const s of splits) {
     await visa.capturePayment(s.visaAuthorizationId!, s.amountCents);
-    await prisma.expenseSplit.update({ where: { id: s.id }, data: { status: "CAPTURED" } });
+    const reward = quoteReward(s.amountCents, item.merchantName, offers);
+    await prisma.expenseSplit.update({
+      where: { id: s.id },
+      data: {
+        status: "CAPTURED",
+        capturedAt: new Date(),
+        visaOfferId: reward.offer?.id ?? null,
+        cashbackCents: reward.cashbackCents,
+        rewardPoints: reward.points,
+      },
+    });
+    receipts.push({ split: s, reward });
   }
   await prisma.itineraryItem.update({ where: { id: itemId }, data: { status: "PURCHASED" } });
+
+  // Post-purchase: each member gets their own receipt with what they earned.
   const breakdown = splits.map((s) => `${s.user.name} ${formatUsd(s.amountCents)}`).join(", ");
-  await notifyTrip(item.tripId, `✅ Booked ${item.title} (${formatUsd(item.priceCents)}). Split: ${breakdown}.`);
+  for (const { split, reward } of receipts) {
+    const cashback = reward.cashbackCents > 0 ? ` + ${formatUsd(reward.cashbackCents)} back (${reward.offer!.headline})` : "";
+    await notifyUser(
+      split.userId,
+      `✅ Booked ${item.title} (${formatUsd(item.priceCents)}). Split: ${breakdown}.\n` +
+        `🧾 Your receipt: ${formatUsd(split.amountCents)} charged · +${reward.points} PICA points${cashback}. ` +
+        "Free cancellation until 48h before the trip, just ask me.",
+      item.tripId,
+    );
+  }
+}
+
+/** Free cancellation until this long before the trip starts. */
+const CANCELLATION_WINDOW_MS = 48 * 60 * 60 * 1000;
+
+/**
+ * Post-purchase: cancel a booked item and refund every member's captured share to the card
+ * it came from. Rewards earned on it are reversed (the REFUNDED status drops them from totals).
+ */
+export async function cancelBooking(tripId: string, itemId: string): Promise<{ ok: true; refunds: { name: string; amountCents: number }[] } | { ok: false; reason: string }> {
+  const item = await prisma.itineraryItem.findFirst({
+    where: { id: itemId, tripId },
+    include: { trip: true, splits: { include: { user: true } } },
+  });
+  if (!item || item.status !== "PURCHASED") return { ok: false, reason: "Only booked items can be cancelled." };
+  if (item.trip.startDate.getTime() - Date.now() < CANCELLATION_WINDOW_MS) {
+    return { ok: false, reason: "The free-cancellation window (48h before the trip) has passed." };
+  }
+
+  // Claim the item first so a double "cancel" can't refund twice.
+  const claimed = await prisma.itineraryItem.updateMany({ where: { id: itemId, status: "PURCHASED" }, data: { status: "CANCELLED" } });
+  if (claimed.count === 0) return { ok: false, reason: "That booking is already being cancelled." };
+
+  const refunds = [];
+  for (const s of item.splits.filter((s) => s.status === "CAPTURED" && s.visaAuthorizationId)) {
+    await visa.refundPayment(s.visaAuthorizationId!, s.amountCents, "GROUP_CANCELLED");
+    await prisma.expenseSplit.update({ where: { id: s.id }, data: { status: "REFUNDED", refundedAt: new Date() } });
+    refunds.push({ name: s.user.name, amountCents: s.amountCents });
+  }
+  await notifyTrip(
+    tripId,
+    `↩️ Cancelled ${item.title}. Refunds on the way to each card: ${refunds.map((r) => `${r.name} ${formatUsd(r.amountCents)}`).join(", ")}. Points from it were reversed.`,
+  );
+  return { ok: true, refunds };
 }
 
 // "YES 4821", "no 4821", "Yes, 4821." (voice transcript) or a bare "yes" — the WHOLE message

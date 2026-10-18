@@ -44,7 +44,7 @@ export async function broadcastItineraryUpdate(tripId: string, updatedByUserId: 
     where: { id: tripId },
     include: {
       members: { include: { user: true } },
-      items: { where: { status: { not: "REMOVED" } }, orderBy: [{ dayIndex: "asc" }, { createdAt: "asc" }] },
+      items: { where: { status: { notIn: ["REMOVED", "CANCELLED"] } }, orderBy: [{ dayIndex: "asc" }, { createdAt: "asc" }] },
     },
   });
   if (!trip) return;

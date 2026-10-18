@@ -3,8 +3,8 @@
 export const ITEM_CATEGORIES = ["LODGING", "ACTIVITY", "FOOD", "TRANSPORT"] as const;
 export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
 
-export type ItemStatus = "PROPOSED" | "PURCHASING" | "FINALIZING" | "PURCHASED" | "REMOVED";
-export type SplitStatus = "PENDING_APPROVAL" | "AUTHORIZED" | "CAPTURED" | "DECLINED" | "VOIDED" | "FAILED";
+export type ItemStatus = "PROPOSED" | "PURCHASING" | "FINALIZING" | "PURCHASED" | "CANCELLED" | "REMOVED";
+export type SplitStatus = "PENDING_APPROVAL" | "AUTHORIZED" | "CAPTURED" | "DECLINED" | "VOIDED" | "FAILED" | "REFUNDED";
 export type ApprovalStatus = "PENDING" | "APPROVED" | "DECLINED" | "EXPIRED";
 
 export function parseJsonArray(value: string | null | undefined): string[] {
