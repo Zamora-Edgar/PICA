@@ -202,7 +202,7 @@
     .progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
 
     /* Chat Elements */
-    .message-timeline { display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
+    .message-timeline { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
     .msg-bubble {
       background: #ffffff; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px;
       display: flex; flex-direction: column; gap: 6px; font-size: 13px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
@@ -300,12 +300,6 @@
       <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <button class="btn btn-primary" onclick="triggerAdjustBudget()">Auto-Optimize Budget</button>
         <button class="btn btn-secondary" onclick="triggerRemindAll()">Remind Group</button>
-        <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 6px;">
-          <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Destination:</span>
-          <button class="btn btn-secondary btn-sm" id="btn-dest-sd" onclick="setDestination('San Diego')">🌊 San Diego</button>
-          <button class="btn btn-secondary btn-sm" id="btn-dest-ny" onclick="setDestination('New York')">🗽 New York</button>
-          <button class="btn btn-secondary btn-sm" id="btn-dest-fl" onclick="setDestination('Florida')">🌴 Florida</button>
-        </div>
       </div>
       <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Auto-syncing every 2.5s</div>
     </div>
@@ -363,13 +357,6 @@
               </select>
               <input type="text" class="sim-input" id="sim-text" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendSimMessage()">
               <button class="btn btn-primary" style="padding: 6px 12px;" onclick="sendSimMessage()">Send</button>
-            </div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button class="btn btn-secondary btn-sm" onclick="quickSend('Find a beachfront hotel under $250')">🏨 Hotel</button>
-              <button class="btn btn-secondary btn-sm" onclick="quickSend('Find a cheap dinner spot')">🌮 Dinner</button>
-              <button class="btn btn-secondary btn-sm" onclick="quickSend('Who is over budget right now?')">📊 Budget</button>
-              <button class="btn btn-secondary btn-sm" onclick="quickSend('What if we go to New York instead?')">🗽 Let\'s go to NYC</button>
-              <button class="btn btn-secondary btn-sm" onclick="quickSend('Change our trip to Florida!')">🌴 Let\'s go to Florida</button>
             </div>
           </div>
         </div>
@@ -472,52 +459,6 @@
       }
     }
 
-    function updateDestinationButtons(dest) {
-      const d = (dest || '').toLowerCase();
-      const sdBtn = document.getElementById('btn-dest-sd');
-      const nyBtn = document.getElementById('btn-dest-ny');
-      const flBtn = document.getElementById('btn-dest-fl');
-      const setStyle = (btn, active) => {
-        if (!btn) return;
-        if (active) {
-          btn.style.background = 'var(--primary-gradient)';
-          btn.style.borderColor = 'rgba(161, 196, 253, 0.6)';
-          btn.style.fontWeight = '800';
-          btn.style.color = '#1e293b';
-        } else {
-          btn.style.background = '#ffffff';
-          btn.style.borderColor = 'rgba(0, 0, 0, 0.1)';
-          btn.style.fontWeight = '600';
-          btn.style.color = 'var(--text)';
-        }
-      };
-      setStyle(sdBtn, d.includes('san diego'));
-      setStyle(nyBtn, d.includes('new york'));
-      setStyle(flBtn, d.includes('florida') || d.includes('miami'));
-    }
-
-    async function setDestination(city) {
-      try {
-        showToast(`✈️ Switching destination to ${city}...`);
-        const res = await fetch('/api/active/destination', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ destination: city })
-        });
-        if (res.ok) {
-          showToast(`✅ Trip adapted to ${city}!`);
-          await refreshAll();
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function quickSend(txt) {
-      document.getElementById('sim-text').value = txt;
-      sendSimMessage();
-    }
-
     function showTypingIndicator() {
       const feed = document.getElementById('message-feed');
       if (feed.innerHTML.includes('Listening for messages')) feed.innerHTML = '';
@@ -604,7 +545,6 @@
           else if (dLower.includes('honolulu')) locText = 'Honolulu, HI';
           document.getElementById('trip-dest').textContent = locText;
           loadDestinationImage(trip.destination);
-          updateDestinationButtons(trip.destination);
         }
         if (trip.members) document.getElementById('member-count').textContent = `${trip.members.length} Members`;
 
