@@ -15,6 +15,7 @@ export const config = {
     agentHandle: process.env.PHOTON_AGENT_HANDLE ?? "",
     webhookSecret: process.env.PHOTON_WEBHOOK_SECRET ?? "",
     voiceNumber: process.env.PHOTON_VOICE_NUMBER ?? "",
+    voiceProfileId: process.env.PHOTON_VOICE_PROFILE_ID ?? "",
     mock: bool(process.env.PHOTON_MOCK, true),
   },
 

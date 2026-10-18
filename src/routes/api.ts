@@ -154,6 +154,18 @@ apiRouter.get("/active", handle(async (_req, res) => {
   res.json({ trip: snapshot, costs: computeCostBreakdown(snapshot), messages, offers: await getMerchantOffers() });
 }));
 
+// Voice SIP status endpoint
+apiRouter.get("/active/voice", handle(async (_req, res) => {
+  res.json({
+    enabled: !!config.photon.voiceNumber,
+    phoneNumber: config.photon.voiceNumber,
+    profileId: config.photon.voiceProfileId,
+    sipDestination: "sips:sip.rtc.elevenlabs.io:5061",
+    transport: "TLS",
+    protocol: "sip",
+  });
+}));
+
 const activeTrip = () =>
   prisma.trip.findFirst({ where: { status: { in: ["PLANNING", "BOOKING"] } }, orderBy: { createdAt: "desc" } });
 

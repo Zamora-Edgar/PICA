@@ -914,9 +914,15 @@
           <div class="hero-tag">☀️ 74°F Sunny & Breezy</div>
         </div>
       </div>
-      <div class="photon-pill" onclick="copyPhotonNumber()" title="Click to copy number">
-        <div class="label">💬 Text PICA on iMessage / SMS</div>
-        <div class="number">+1 (628) 316-6196</div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <div class="photon-pill" onclick="copyPhotonNumber()" title="Click to copy text number">
+          <div class="label">💬 Text PICA (iMessage / SMS)</div>
+          <div class="number">+1 (628) 316-6196</div>
+        </div>
+        <div class="photon-pill" style="border-color: rgba(16, 185, 129, 0.35); background: rgba(16, 185, 129, 0.1);" onclick="copyVoiceNumber()" title="Click to copy voice number">
+          <div class="label" style="color: #6ee7b7;">🎙️ Call PICA (Photon SIP Voice)</div>
+          <div class="number" style="color: #34d399;">+1 (424) 437-8955</div>
+        </div>
       </div>
     </div>
 
@@ -1041,7 +1047,12 @@
 
     function copyPhotonNumber() {
       navigator.clipboard.writeText('+16283166196');
-      showToast('Copied Photon number +1 (628) 316-6196 to clipboard!');
+      showToast('Copied Photon text line +1 (628) 316-6196 to clipboard!');
+    }
+
+    function copyVoiceNumber() {
+      navigator.clipboard.writeText('+14244378955');
+      showToast('Copied Photon Voice line +1 (424) 437-8955 to clipboard!');
     }
 
     function copyInviteLink() {
