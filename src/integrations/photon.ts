@@ -172,7 +172,7 @@ export function startPhotonPolling(onMessage: (event: PhotonInboundEvent) => Pro
 
   const projectId = config.photon.projectId;
   const processedMessageIds = new Set<string>();
-  let createdSince = new Date(Date.now() - 5000).toISOString();
+  let createdSince = new Date(Date.now() - 60000).toISOString();
 
   console.log(`📡 PICA Photon 2.0 Poller starting for project: ${projectId}`);
 
