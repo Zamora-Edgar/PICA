@@ -34,6 +34,11 @@ export const config = {
     baseURL: process.env.LLM_BASE_URL || undefined,
   },
 
+  // 📍 LOCATIONIQ — global geocoding and real-world places discovery
+  locationiq: {
+    apiKey: process.env.LOCATIONIQ_API_KEY ?? "",
+  },
+
   approvalTtlMinutes: Number(process.env.APPROVAL_TTL_MINUTES ?? 30),
   historyLimit: 30, // messages of shared cross-channel history fed to the agent
 };

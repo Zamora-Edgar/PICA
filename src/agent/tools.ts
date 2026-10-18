@@ -11,7 +11,8 @@ import { buildWallet } from "../commerce/wallet";
 import { prisma } from "../db";
 import { formatUsd, ITEM_CATEGORIES, parseJsonArray } from "../domain/types";
 import { getMerchantOffers } from "../integrations/visa";
-import { CATALOG, getCatalogOption, matchesDestination, searchCatalog } from "./catalog";
+import { CATALOG, getAllCatalogOptions, getCatalogOption, matchesDestination, registerDynamicOptions, searchCatalog } from "./catalog";
+import { discoverGlobalDestination } from "../integrations/locationiq";
 import { recommendForTrip } from "./recommender";
 import { computeCostBreakdown, loadTripSnapshot } from "./tripContext";
 
@@ -121,14 +122,36 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
   switch (name as ToolName) {
     case "change_destination": {
       const raw = String(args.destination || "").toLowerCase();
-      let city: "San Diego" | "New York" | "Florida" = "San Diego";
+      let city = "San Diego";
       let fullName = "San Diego Weekend Getaway";
+      let customOptions: any[] = [];
+
       if (raw.includes("new york") || raw.includes("nyc") || raw.includes("manhattan") || raw.includes("ny")) {
         city = "New York";
         fullName = "New York City Explorer";
       } else if (raw.includes("florida") || raw.includes("miami") || raw.includes("orlando") || raw.includes("key west") || raw.includes("fl")) {
         city = "Florida";
         fullName = "Florida Sunshine Getaway";
+      } else if (raw.includes("san diego") || raw.includes("sd") || raw.includes("california")) {
+        city = "San Diego";
+        fullName = "San Diego Weekend Getaway";
+      } else {
+        // 🌍 Global discovery via LocationIQ
+        try {
+          const discovered = await discoverGlobalDestination(args.destination);
+          if (discovered && discovered.options.length > 0) {
+            city = discovered.location.city;
+            fullName = `${discovered.location.city} Adventure`;
+            registerDynamicOptions(discovered.options);
+            customOptions = discovered.options;
+          } else {
+            city = args.destination.trim();
+            fullName = `${city} Group Getaway`;
+          }
+        } catch (e) {
+          city = args.destination.trim();
+          fullName = `${city} Group Getaway`;
+        }
       }
 
       const tripName = args.tripName || fullName;
@@ -145,8 +168,9 @@ export async function executeTool(name: string, rawArgs: unknown, ctx: ToolConte
       });
 
       // Auto-seed starter hotel for the new destination
-      const starterOptions = CATALOG.filter((o) => o.destination === city && o.category === "LODGING");
-      const starterHotel = starterOptions[1] || starterOptions[0];
+      const availableOptions = customOptions.length > 0 ? customOptions : getAllCatalogOptions().filter((o) => matchesDestination(o.destination, city));
+      const starterHotel = availableOptions.find((o) => o.category === "LODGING") || availableOptions[0];
+
       if (starterHotel) {
         await prisma.itineraryItem.create({
           data: {

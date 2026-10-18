@@ -85,6 +85,16 @@ const LEGACY_ID_MAP: Record<string, string> = {
   trn_airport: "trn_sd_airport",
 };
 
+export const DYNAMIC_OPTIONS: Map<string, CatalogOption> = new Map();
+
+export function registerDynamicOptions(options: CatalogOption[]) {
+  for (const o of options) DYNAMIC_OPTIONS.set(o.id, o);
+}
+
+export function getAllCatalogOptions(): CatalogOption[] {
+  return [...CATALOG, ...DYNAMIC_OPTIONS.values()];
+}
+
 export function searchCatalog(filter: {
   category?: ItemCategory;
   maxPriceCents?: number;
@@ -92,7 +102,8 @@ export function searchCatalog(filter: {
   destination?: string;
 }): CatalogOption[] {
   const q = filter.query?.toLowerCase();
-  return CATALOG.filter(
+  const allOptions = getAllCatalogOptions();
+  return allOptions.filter(
     (o) =>
       (!filter.destination || matchesDestination(o.destination, filter.destination)) &&
       (!filter.category || o.category === filter.category) &&
@@ -103,5 +114,5 @@ export function searchCatalog(filter: {
 
 export const getCatalogOption = (id: string): CatalogOption | undefined => {
   const mappedId = LEGACY_ID_MAP[id] || id;
-  return CATALOG.find((o) => o.id === mappedId);
+  return CATALOG.find((o) => o.id === mappedId) || DYNAMIC_OPTIONS.get(mappedId);
 };
